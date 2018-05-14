@@ -1,0 +1,3 @@
+[submodule "UnityTK"]
+	path = UnityTK
+	url = git@github.com:kennux/UnityTK.git
