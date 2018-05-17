@@ -477,7 +477,6 @@ GameObject:
   - component: {fileID: 1591380296}
   - component: {fileID: 1591380299}
   - component: {fileID: 1591380298}
-  - component: {fileID: 1591380300}
   m_Layer: 0
   m_Name: Hair
   m_TagString: Untagged
@@ -544,7 +543,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5ae4cbf8e2050e428683e1d4d96824d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  update: 0
+  update: 1
   prevFrameVertices: []
   initialVertices: []
   prevFrameMatrix:
@@ -564,18 +563,6 @@ MonoBehaviour:
     e31: 0
     e32: 0
     e33: 0
---- !u!114 &1591380300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1591380294}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9877e6fc64050094f99bcce43cc4f8d2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stiffness: 1
 --- !u!1 &1708945335
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@ namespace VHair
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
 
             // Initial vertex transform
-            var vertices = this.instance.GetVertexArray();
+            var vertices = this.instance.vertices.cpuReference;
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = this.prevFrameMatrix.MultiplyPoint3x4(vertices[i]);
@@ -33,7 +33,7 @@ namespace VHair
         {
             base._Update(timestep);
 
-            System.Array.Copy(this.instance.GetVertexArray(), this.prevFrameVertices, this.instance.asset.vertexCount);
+            System.Array.Copy(this.instance.vertices.cpuReference, this.prevFrameVertices, this.instance.asset.vertexCount);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
         }
     }

@@ -23,16 +23,12 @@ namespace VHair
         [SerializeField]
         private HairStrand[] strands;
 
-        public HairMovability movability
-        {
-            get { return this.movability; }
-        }
-
         /// <summary>
-        /// The movability mask
+        /// The movability bits of the hair.
+        /// Bit index maps to <see cref="vertexCount"/>, <see cref="HairMovability"/> for the utilities to access this data.
         /// </summary>
         [SerializeField]
-        private HairMovability _movability;
+        private uint[] movability;
 
         /// <summary>
         /// Whether or not this asset already has data imported.
@@ -61,57 +57,45 @@ namespace VHair
             System.Array.Copy(this.strands, strands, strands.Length);
         }
 
-        public void GetRawDataCopy(out Vector3[] vertices, out HairStrand[] strands)
+        /// <summary>
+        /// Creates a copy of <see cref="movability"/>
+        /// </summary>
+        /// <param name="movability"></param>
+        public void GetMovabilityData(out uint[] movability)
+        {
+            movability = new uint[Mathf.CeilToInt(this.vertices.Length / 32f)];
+            System.Array.Copy(this.movability, movability, movability.Length);
+        }
+
+        public void GetRawDataCopy(out Vector3[] vertices, out HairStrand[] strands, out uint[] movability)
         {
             GetVertexData(out vertices);
             GetStrandData(out strands);
+            GetMovabilityData(out movability);
         }
 
         /// <summary>
-        /// <see cref="GetRawDataCopy(out Vector3[], out HairStrand[])"/> for unity native arrays.
+        /// Sets the hair asset data.
+        /// Copies data from input into new arrays and stores them internally.
         /// </summary>
-        public void GetRawDataCopyNA(out NativeArray<Vector3> vertices, out NativeArray<HairStrand> strands, Allocator allocator = Allocator.Persistent)
-        {
-            vertices = new NativeArray<Vector3>(this.vertices, allocator);
-            strands = new NativeArray<HairStrand>(this.strands, allocator);
-        }
-
-        public void GetStrandInformation(int index, out int vertexCount, ref Vector3[] vertices)
-        {
-            // Range check
-            if (index < 0 || index >= this.strands.Length)
-                throw new System.ArgumentOutOfRangeException("index");
-
-            // Read vertex data
-            int start = this.strands[index].firstVertex;
-            int end = this.strands[index].lastVertex;
-            vertexCount = (end - start)+1;
-
-            // Make sure preAlloc is set
-            if (ReferenceEquals(vertices, null) || vertices.Length < vertexCount)
-                vertices = new Vector3[vertexCount];
-
-            // Write vertex data
-            /*
-            Unoptimized:
-            int j = 0;
-            for (int i = start; i <= end; i++)
-            {
-                vertices[j] = this.vertices[i];
-                j++;
-            }
-            */
-            // Direct memory copy
-            System.Array.Copy(this.vertices, start, vertices, 0, vertexCount);
-        }
-
-        public void SetData(Vector3[] vertices, HairStrand[] strands)
+        /// <param name="vertices">Vertices to set</param>
+        /// <param name="strands">Strands to set</param>
+        /// <param name="movability">Movability bits to set (<see cref="HairAsset.movability"/>), if null every vertex is marked as immovable</param>
+        public void SetData(Vector3[] vertices, HairStrand[] strands, uint[] movability = null)
         {
             this.vertices = new Vector3[vertices.Length];
             this.strands = new HairStrand[strands.Length];
+            this.movability = HairMovability.CreateData(vertices.Length);
 
             vertices.CopyTo(this.vertices, 0);
             strands.CopyTo(this.strands, 0);
+
+            if (movability != null)
+            {
+                if (movability.Length != this.movability.Length)
+                    throw new System.ArgumentException("Incorrect movability array size, length should be ceil(vertexCount / 32f)");
+                movability.CopyTo(this.movability, 0);
+            }
         }
     }
 }

@@ -11,33 +11,44 @@ namespace VHair
     /// 
     /// This is stored internally as an array of unsigned integers.
     /// </summary>
-    [Serializable]
-    public class HairMovability
+    public static class HairMovability
     {
         /// <summary>
-        /// Internal data for storing the movability bits.
+        /// Creates a new array to store the movability data for the specified vertex count.
+        /// Array size: Ceil(vertexCount / 32f)
         /// </summary>
-        [SerializeField]
-        private uint[] _data;
-
-        public HairMovability(int vertices)
+        /// <param name="vertexCount"></param>
+        /// <returns>New uint array instance</returns>
+        public static uint[] CreateData(int vertexCount)
         {
-            this._data = new uint[Mathf.CeilToInt(vertices / 32f)];
+            return new uint[Mathf.CeilToInt(vertexCount / 32f)];
         }
 
-        public void SetMovable(int index, bool isMovable)
+        /// <summary>
+        /// Helper method of setting movability bits in the specified data array.
+        /// </summary>
+        /// <param name="index">The vertex index to set</param>
+        /// <param name="isMovable">The flag state to set</param>
+        /// <param name="movability">Movability data, previously created with <see cref="CreateData(int)"/></param>
+        public static void SetMovable(int index, bool isMovable, uint[] movability)
         {
             int dataIndex = Mathf.FloorToInt(index / 32f);
             if (isMovable)
-                this._data[dataIndex] |= (1u >> (index % 32));
+                movability[dataIndex] |= (1u << (index % 32));
             else
-                this._data[dataIndex] &= ~(1u >> (index % 32));
+                movability[dataIndex] &= ~(1u << (index % 32));
         }
 
-        public bool IsMovable(int index)
+        /// <summary>
+        /// Returns whether or not the specified vertex index is set as movable in the specified movability data.
+        /// </summary>
+        /// <param name="index">The vertex index</param>
+        /// <param name="movability">The movability data</param>
+        /// <returns>Whether or not this vertex is movable.</returns>
+        public static bool IsMovable(int index, uint[] movability)
         {
             int dataIndex = Mathf.FloorToInt(index / 32f);
-            return (this._data[dataIndex] & (1u >> (index % 32))) != 0;
+            return (movability[dataIndex] & (1u << (index % 32))) != 0;
         }
     }
 }

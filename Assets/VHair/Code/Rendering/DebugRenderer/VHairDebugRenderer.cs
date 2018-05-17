@@ -41,7 +41,7 @@ namespace VHair
         private void UpdateMeshInitial()
         {
             this._indices.Clear();
-            this.instance.ReadStrandData(this._strands);
+            this.instance.strands.cpuReference.CopyTo(this._strands, 0);
 
             int sLen = _strands.Length;
             for (int i = 0; i < sLen; i++)
@@ -61,7 +61,7 @@ namespace VHair
         private void UpdateMesh()
         {
             // Get data copy
-            this.instance.ReadVertexData(this._vertices);
+            this.instance.vertices.cpuReference.CopyTo(this._vertices, 0);
 
             // Set mesh data
             mesh.vertices = this._vertices;

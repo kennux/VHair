@@ -20,8 +20,9 @@ namespace VHair
             Matrix4x4 invPrevMatrix = prevMatrix.inverse;
 
             // Read vertices and strands
-            Vector3[] vertices = this.instance.GetVertexArray();
-            HairStrand[] strands = this.instance.GetStrandsArray();
+            HairStrand[] strands = this.instance.strands.cpuReference;
+            Vector3[] vertices = this.instance.vertices.cpuReference;
+            uint[] movability = this.instance.movability.cpuReference;
 
             Vector3 gravity = Physics.gravity;
             HairStrand strand;
@@ -37,6 +38,9 @@ namespace VHair
 
                 for (int i = strand.firstVertex+1; i <= strand.lastVertex; i++)
                 {
+                    if (!HairMovability.IsMovable(i, movability))
+                        continue;
+
                     lastFramePosWS = vertices[i];
                     lastFramePosOS = invPrevMatrix.MultiplyPoint3x4(lastFramePosWS);
 
@@ -55,7 +59,7 @@ namespace VHair
             }
 
             // Set dirty
-            this.instance.SetVerticesModified(true);
+            this.instance.vertices.SetGPUDirty();
         }
     }
 }

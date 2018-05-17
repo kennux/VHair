@@ -15,7 +15,7 @@ namespace VHair
 
         public override void SimulationStep(float timestep)
         {
-            var vertexArray = this.instance.GetVertexArray();
+            var vertexArray = this.instance.vertices.cpuReference;
             Matrix4x4 matrix = Matrix4x4.TRS(this.transform.position, this.transform.rotation, this.transform.lossyScale);
             var vertices = this.simulation.vertices;
             for (int i = 0; i < vertexArray.Length; i++)
@@ -23,7 +23,7 @@ namespace VHair
                 vertexArray[i] = matrix.MultiplyPoint3x4(vertices[i]);
             }
             
-            this.instance.SetVerticesModified(true);
+            this.instance.vertices.SetGPUDirty();
         }
     }
 }

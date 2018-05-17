@@ -53,6 +53,18 @@ namespace VHair.Editor
             {
                 EditorGUILayout.LabelField("Strand count: " + target.strandCount);
                 EditorGUILayout.LabelField("Vertex count: " + target.vertexCount);
+
+                // TODO: Implement post processing modules
+                if (GUILayout.Button("Set standard Movability"))
+                {
+                }
+
+                if (GUILayout.Button("Halven strand count"))
+                {
+                    for (int i = 0; i < target.strandCount; i+=2)
+                    {
+                    }
+                }
             }
         }
     }
