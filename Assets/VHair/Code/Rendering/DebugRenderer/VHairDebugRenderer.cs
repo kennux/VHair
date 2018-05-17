@@ -65,6 +65,7 @@ namespace VHair
 
             // Set mesh data
             mesh.vertices = this._vertices;
+            mesh.RecalculateBounds();
             mesh.UploadMeshData(false);
         }
 

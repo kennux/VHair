@@ -90,7 +90,6 @@ namespace VHair
         /// </summary>
         public void GetRawDataCopy(out Vector3[] vertices, out HairStrand[] strands, out uint[] movability)
         {
-            Debug.Log(this.strands[0].lastVertex);
             vertices = GetVertexData();
             strands = GetStrandData();
             movability = GetMovabilityData();
@@ -114,7 +113,6 @@ namespace VHair
         {
             this.strands = new HairStrand[strands.Length];
             strands.CopyTo(this.strands, 0);
-            Debug.Log(this.strands[0].lastVertex);
         }
 
         /// <summary>
