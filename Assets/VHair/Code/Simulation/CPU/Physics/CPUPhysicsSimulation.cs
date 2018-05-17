@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace VHair
 {
+    /// <summary>
+    /// Base class for cpu based physics simulation.
+    /// </summary>
     public class CPUPhysicsSimulation : HairSimulation
     {
         // Simulation properties
@@ -15,10 +18,12 @@ namespace VHair
         [HideInInspector]
         public Matrix4x4 prevFrameMatrix;
 
-        protected void Start()
+        protected override void Start()
         {
-            this.instance.asset.GetVertexData(out this.prevFrameVertices);
-            this.instance.asset.GetVertexData(out this.initialVertices);
+            base.Start();
+
+            this.prevFrameVertices = this.instance.asset.GetVertexData();
+            this.initialVertices = this.instance.asset.GetVertexData();
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
 
             // Initial vertex transform

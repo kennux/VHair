@@ -35,43 +35,65 @@ namespace VHair
         /// </summary>
         public bool wasImported = false;
 
+        /// <summary>
+        /// The amount of strands in this hair asset.
+        /// </summary>
         public int strandCount
         {
             get { return this.strands.Length; }
         }
 
+        /// <summary>
+        /// The amount of vertices in this hair asset.
+        /// </summary>
         public int vertexCount
         {
             get { return this.vertices.Length; }
         }
 
-        public void GetVertexData(out Vector3[] vertices)
+        /// <summary>
+        /// Allocates and returns a copy of <see cref="vertices"/>
+        /// </summary>
+        public Vector3[] GetVertexData()
         {
-            vertices = new Vector3[this.vertices.Length];
+            Vector3[] vertices = new Vector3[this.vertices.Length];
             System.Array.Copy(this.vertices, vertices, vertices.Length);
+            return vertices;
         }
 
-        public void GetStrandData(out HairStrand[] strands)
+        /// <summary>
+        /// Allocates and returns a copy of <see cref="strands"/>
+        /// </summary>
+        public HairStrand[] GetStrandData()
         {
-            strands = new HairStrand[this.strands.Length];
+            HairStrand[] strands = new HairStrand[this.strands.Length];
             System.Array.Copy(this.strands, strands, strands.Length);
+            return strands;
         }
 
         /// <summary>
         /// Creates a copy of <see cref="movability"/>
         /// </summary>
         /// <param name="movability"></param>
-        public void GetMovabilityData(out uint[] movability)
+        public uint[] GetMovabilityData()
         {
-            movability = new uint[Mathf.CeilToInt(this.vertices.Length / 32f)];
+            uint[] movability = new uint[Mathf.CeilToInt(this.vertices.Length / 32f)];
             System.Array.Copy(this.movability, movability, movability.Length);
+            return movability;
         }
 
+        /// <summary>
+        /// AiO version of:
+        /// <see cref="GetVertexData"/>
+        /// <see cref="GetStrandData"/>
+        /// <see cref="GetMovabilityData()"/>
+        /// </summary>
         public void GetRawDataCopy(out Vector3[] vertices, out HairStrand[] strands, out uint[] movability)
         {
-            GetVertexData(out vertices);
-            GetStrandData(out strands);
-            GetMovabilityData(out movability);
+            Debug.Log(this.strands[0].lastVertex);
+            vertices = GetVertexData();
+            strands = GetStrandData();
+            movability = GetMovabilityData();
         }
 
         /// <summary>
@@ -92,6 +114,7 @@ namespace VHair
         {
             this.strands = new HairStrand[strands.Length];
             strands.CopyTo(this.strands, 0);
+            Debug.Log(this.strands[0].lastVertex);
         }
 
         /// <summary>

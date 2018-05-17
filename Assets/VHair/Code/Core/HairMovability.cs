@@ -7,9 +7,7 @@ using System.Threading.Tasks;
 namespace VHair
 {
     /// <summary>
-    /// Data structure for hair movability mask.
-    /// 
-    /// This is stored internally as an array of unsigned integers.
+    /// Static helper class for accessing hair movability data which is packed into an unsigned integer array.
     /// </summary>
     public static class HairMovability
     {

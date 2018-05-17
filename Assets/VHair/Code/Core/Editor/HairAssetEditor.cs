@@ -60,8 +60,7 @@ namespace VHair.Editor
                 if (GUILayout.Button("Set standard Movability"))
                 {
                     uint[] movability = HairMovability.CreateData(target.vertexCount);
-                    HairStrand[] strands;
-                    target.GetStrandData(out strands);
+                    HairStrand[] strands = target.GetStrandData();
 
                     for (int i = 0; i < strands.Length; i++)
                     {
@@ -75,13 +74,8 @@ namespace VHair.Editor
                     }
 
                     target.InitializeMovability(movability);
-                }
-
-                if (GUILayout.Button("Halven strand count"))
-                {
-                    for (int i = 0; i < target.strandCount; i+=2)
-                    {
-                    }
+                    // Mark dirty
+                    EditorUtility.SetDirty(target);
                 }
             }
         }

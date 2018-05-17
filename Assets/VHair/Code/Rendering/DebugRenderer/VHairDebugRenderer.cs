@@ -8,7 +8,7 @@ namespace VHair
 {
     /// <summary>
     /// Simple and inefficient implementation of a vhair renderer.
-    /// Mainly used for debug purposes.
+    /// Mainly used for debug purposes. Should not be used in production!
     /// </summary>
     public class VHairDebugRenderer : HairRenderer
     {

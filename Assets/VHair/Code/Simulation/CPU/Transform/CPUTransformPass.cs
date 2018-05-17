@@ -12,6 +12,10 @@ namespace VHair
     /// </summary>
     public class CPUTransformPass : HairSimulationPass<CPUTransformSimulation>
     {
+        public override void InitializeSimulation()
+        {
+
+        }
 
         public override void SimulationStep(float timestep)
         {

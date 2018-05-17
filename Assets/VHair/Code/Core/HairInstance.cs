@@ -14,18 +14,30 @@ namespace VHair
 
         #region Data
 
+        /// <summary>
+        /// Hair vertex data.
+        /// <see cref="HairAsset.vertices"/>
+        /// </summary>
         public CPUGPUData<Vector3> vertices
         {
             get { return this._vertices; }
         }
         private CPUGPUData<Vector3> _vertices;
 
+        /// <summary>
+        /// Hair strand data.
+        /// <see cref="HairAsset.strands"/>
+        /// </summary>
         public CPUGPUData<HairStrand> strands
         {
             get { return this._strands; }
         }
         private CPUGPUData<HairStrand> _strands;
 
+        /// <summary>
+        /// Hair movability data.
+        /// <see cref="HairAsset.movability"/>
+        /// </summary>
         public CPUGPUData<uint> movability
         {
             get { return this._movability; }
@@ -36,10 +48,10 @@ namespace VHair
         public int strandCount { get { return this._strands.count; } }
 
         #endregion
-        
 
         /// <summary>
         /// Initializes the hair instance.
+        /// Loads data from <see cref="asset"/>
         /// </summary>
         public void Awake()
         {

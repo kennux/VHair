@@ -21,7 +21,5 @@ namespace VHair
         /// The last vertex of the strand.
         /// </summary>
         public int lastVertex;
-
-
     }
 }

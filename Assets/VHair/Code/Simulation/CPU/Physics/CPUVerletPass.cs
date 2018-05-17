@@ -6,9 +6,8 @@ namespace VHair
 {
     public class CPUVerletPass : HairSimulationPass<CPUPhysicsSimulation>
     {
-        protected override void Awake()
+        public override void InitializeSimulation()
         {
-            base.Awake();
 
         }
 
@@ -36,7 +35,7 @@ namespace VHair
                 // First vertex is immovable
                 vertices[strand.firstVertex] = matrix.MultiplyPoint3x4(this.simulation.initialVertices[strand.firstVertex]);
 
-                for (int i = strand.firstVertex+1; i <= strand.lastVertex; i++)
+                for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
                 {
                     if (!HairMovability.IsMovable(i, movability))
                         continue;

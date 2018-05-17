@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace VHair
 {
+    /// <summary>
+    /// Simulation master object for only transforming the hair vertex buffer to follow the unity engine transform.
+    /// This does only support the <see cref="CPUTransformPass"/> and does not do any real physics simulation!
+    /// </summary>
     public class CPUTransformSimulation : HairSimulation
     {
         public Vector3[] vertices
@@ -16,7 +20,7 @@ namespace VHair
 
         protected void Awake()
         {
-            this.instance.asset.GetVertexData(out this._vertices);
+            this._vertices = this.instance.asset.GetVertexData();
         }
     }
 }
