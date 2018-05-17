@@ -38,7 +38,9 @@ namespace VHair.Editor
 
                     // Import
                     this.currentImporter.Import(out vertices, out strands);
-                    target.SetData(vertices, strands);
+                    target.InitializeVertices(vertices);
+                    target.InitializeStrands(strands);
+                    target.InitializeMovability();
                     target.wasImported = true;
 
                     // Mark dirty
@@ -57,6 +59,22 @@ namespace VHair.Editor
                 // TODO: Implement post processing modules
                 if (GUILayout.Button("Set standard Movability"))
                 {
+                    uint[] movability = HairMovability.CreateData(target.vertexCount);
+                    HairStrand[] strands;
+                    target.GetStrandData(out strands);
+
+                    for (int i = 0; i < strands.Length; i++)
+                    {
+                        HairStrand strand = strands[i];
+                        HairMovability.SetMovable(strand.firstVertex, false, movability);
+                        int cnt = (strand.lastVertex - strand.firstVertex)+1;
+                        for (int j = 1; j < cnt; j++)
+                        {
+                            HairMovability.SetMovable(strand.firstVertex + j, true, movability);
+                        }
+                    }
+
+                    target.InitializeMovability(movability);
                 }
 
                 if (GUILayout.Button("Halven strand count"))

@@ -53,11 +53,8 @@ namespace VHair
                     Vector3 p1 = vertices[j], p2 = vertices[k], dir = (p2-p1);
                     float len = Mathf.Max(dir.magnitude, float.Epsilon), iLen = this.lengths[j];
 
-                    // Calculate the amount the hair is being stretched or compressed
-                    float stretchFactor = 1f - (len / iLen);
-
                     // Enforce length constraints
-                    vertices[k] = p2 + (dir * stretchFactor * (this.stiffness * timestep));
+                    vertices[k] = p2 + (dir * 1 * (this.stiffness * timestep));
                 }
             }
 

@@ -75,21 +75,33 @@ namespace VHair
         }
 
         /// <summary>
-        /// Sets the hair asset data.
-        /// Copies data from input into new arrays and stores them internally.
+        /// Initializes (reallocates and overwrites internal-) vertex data.
         /// </summary>
-        /// <param name="vertices">Vertices to set</param>
-        /// <param name="strands">Strands to set</param>
-        /// <param name="movability">Movability bits to set (<see cref="HairAsset.movability"/>), if null every vertex is marked as immovable</param>
-        public void SetData(Vector3[] vertices, HairStrand[] strands, uint[] movability = null)
+        /// <param name="vertices">The vertex data to write to the asset.</param>
+        public void InitializeVertices(Vector3[] vertices)
         {
             this.vertices = new Vector3[vertices.Length];
-            this.strands = new HairStrand[strands.Length];
-            this.movability = HairMovability.CreateData(vertices.Length);
-
             vertices.CopyTo(this.vertices, 0);
-            strands.CopyTo(this.strands, 0);
+        }
 
+        /// <summary>
+        /// Initializes (reallocates and overwrites internal- ) strand data.
+        /// </summary>
+        /// <param name="strands">The strand data to write to the asset.</param>
+        public void InitializeStrands(HairStrand[] strands)
+        {
+            this.strands = new HairStrand[strands.Length];
+            strands.CopyTo(this.strands, 0);
+        }
+
+        /// <summary>
+        /// Initializes (reallocates and overwrites internal- ) movability data.
+        /// </summary>
+        /// <param name="movability">The mobility data to write, if null every vertex is marked as immovable.</param>
+        public void InitializeMovability(uint[] movability = null)
+        {
+            this.movability = HairMovability.CreateData(vertices.Length);
+            
             if (movability != null)
             {
                 if (movability.Length != this.movability.Length)
