@@ -4,19 +4,18 @@ using UnityEngine;
 
 namespace VHair
 {
-    public class CPUVerletPass : HairSimulationPass<CPUPhysicsSimulation>
+    public class CPUVerlet : HairSimulationPass<CPUPhysicsSimulation>
     {
         public override void InitializeSimulation()
         {
 
         }
 
-        public override void SimulationStep(float timestep)
+        protected override void _SimulationStep(float timestep)
         {
+            // TODO: Damping
             Matrix4x4 matrix = this.transform.localToWorldMatrix;
-            Matrix4x4 prevMatrix = this.simulation.prevFrameMatrix;
-            Matrix4x4 invMatrix = matrix.inverse;
-            Matrix4x4 invPrevMatrix = prevMatrix.inverse;
+            Matrix4x4 invPrevMatrix = this.simulation.prevFrameMatrix.inverse;
 
             // Read vertices and strands
             HairStrand[] strands = this.instance.strands.cpuReference;

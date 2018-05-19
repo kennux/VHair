@@ -30,7 +30,7 @@ namespace VHair
         /// <param name="movability">Movability data, previously created with <see cref="CreateData(int)"/></param>
         public static void SetMovable(int index, bool isMovable, uint[] movability)
         {
-            int dataIndex = Mathf.FloorToInt(index / 32f);
+            int dataIndex = (int)(index / 32f); // Mathf.FloorToInt(index / 32f);
             if (isMovable)
                 movability[dataIndex] |= (1u << (index % 32));
             else
@@ -45,7 +45,7 @@ namespace VHair
         /// <returns>Whether or not this vertex is movable.</returns>
         public static bool IsMovable(int index, uint[] movability)
         {
-            int dataIndex = Mathf.FloorToInt(index / 32f);
+            int dataIndex = (int)(index / 32f); // Mathf.FloorToInt(index / 32f);
             return (movability[dataIndex] & (1u << (index % 32))) != 0;
         }
     }

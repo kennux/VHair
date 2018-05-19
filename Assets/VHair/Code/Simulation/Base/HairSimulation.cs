@@ -67,7 +67,8 @@ namespace VHair
             UpdatePasses();
             foreach (var pass in this.passes)
             {
-                pass.SimulationStep(timestep);
+                if (pass.enabled)
+                    pass.SimulationStep(timestep);
             }
         }
 

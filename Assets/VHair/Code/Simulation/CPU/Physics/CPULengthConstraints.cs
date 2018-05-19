@@ -30,7 +30,7 @@ namespace VHair
             }
         }
 
-        public override void SimulationStep(float timestep)
+        protected override void _SimulationStep(float timestep)
         {
             HairStrand[] strands = this.instance.strands.cpuReference;
             Vector3[] vertices = this.instance.vertices.cpuReference;

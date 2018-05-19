@@ -7,13 +7,13 @@ namespace VHair
 {
     public class CPUSphereCollision : HairSimulationPass<CPUPhysicsSimulation>
     {
-        public float pushForce = 50;
         public SphereCollider[] colliders;
 
         private struct CollisionSphere
         {
             public Vector3 center;
             public float radius;
+            public float radiusSq;
         }
 
         public override void InitializeSimulation()
@@ -21,7 +21,7 @@ namespace VHair
 
         }
 
-        public override void SimulationStep(float timestep)
+        protected override void _SimulationStep(float timestep)
         {
             List<CollisionSphere> colliders = ListPool<CollisionSphere>.Get();
 
@@ -30,7 +30,8 @@ namespace VHair
                 colliders.Add(new CollisionSphere()
                 {
                     center = this.colliders[i].transform.TransformPoint(this.colliders[i].center),
-                    radius = this.colliders[i].radius
+                    radius = this.colliders[i].radius,
+                    radiusSq = this.colliders[i].radius * this.colliders[i].radius
                 });
             }
             int colliderCount = colliders.Count;
@@ -52,11 +53,13 @@ namespace VHair
                         var c = colliders[j];
 
                         // Intersection?
-                        if (Vector3.Distance(v, c.center) <= c.radius)
+                        Vector3 dir = (v - c.center);
+                        float sqrMag = dir.sqrMagnitude;
+                        if (sqrMag <= c.radiusSq) // if (Vector3.Distance(v, c.center) <= c.radius)
                         {
                             // Intersection! push the vertex out
-                            Vector3 dir = (v - c.center).normalized;
-                            v += dir * this.pushForce * timestep;
+                            float d = Mathf.Sqrt(sqrMag); // dir.magnitude;
+                            v += (dir / d) * (c.radius - d);
                             wasModified = true;
                         }
                     }

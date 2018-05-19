@@ -243,7 +243,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.05
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -293,6 +293,48 @@ MonoBehaviour:
 Transform:
   m_PrefabParentObject: {fileID: 400000, guid: db3b0a41170a1394aaca6ae68f7436b0, type: 3}
   m_PrefabInternal: {fileID: 1316276151}
+--- !u!1 &600566119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 600566121}
+  - component: {fileID: 600566120}
+  m_Layer: 0
+  m_Name: WindZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!182 &600566120
+WindZone:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 600566119}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 1
+  m_WindTurbulence: 1
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.01
+--- !u!4 &600566121
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 600566119}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.07796353, y: 0.13894492, z: 0.007999927}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1001 &1316276151
 Prefab:
   m_ObjectHideFlags: 0
@@ -460,7 +502,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 2300000, guid: db3b0a41170a1394aaca6ae68f7436b0, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: db3b0a41170a1394aaca6ae68f7436b0, type: 3}
@@ -478,6 +520,8 @@ GameObject:
   - component: {fileID: 1591380299}
   - component: {fileID: 1591380298}
   - component: {fileID: 1591380300}
+  - component: {fileID: 1591380302}
+  - component: {fileID: 1591380303}
   - component: {fileID: 1591380301}
   m_Layer: 0
   m_Name: Hair
@@ -534,6 +578,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a9539d4edd99b7439fe44b9eb676621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iterationsPerStep: 1
 --- !u!114 &1591380299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -576,6 +621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9877e6fc64050094f99bcce43cc4f8d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iterationsPerStep: 1
   stiffness: 25
 --- !u!114 &1591380301
 MonoBehaviour:
@@ -588,9 +634,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0fa8e75bc5738724baf5f50746a6758c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pushForce: 1
+  iterationsPerStep: 1
   colliders:
   - {fileID: 1996441018}
+--- !u!114 &1591380302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1591380294}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7796faed2b5dd0a458e5d9ee52afef75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iterationsPerStep: 2
+  stiffness: 18
+  vertexRange: 3
+--- !u!114 &1591380303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1591380294}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0dd4caf82c4169e44a680a32c717bf1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iterationsPerStep: 1
+  windZone: {fileID: 600566120}
 --- !u!1 &1708945335
 GameObject:
   m_ObjectHideFlags: 0
@@ -646,6 +719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2670c60b98121145843d235b28d475f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  iterationsPerStep: 1
 --- !u!114 &1708945339
 MonoBehaviour:
   m_ObjectHideFlags: 0

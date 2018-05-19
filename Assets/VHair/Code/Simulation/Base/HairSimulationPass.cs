@@ -13,6 +13,14 @@ namespace VHair
     /// <typeparam name="T">The hair simulation base class.</typeparam>
     public abstract class HairSimulationPass<T> : HairInstanceComponent<HairInstance>, IHairSimulationPass where T : HairSimulation
     {
+        /// <summary>
+        /// Amount of iterations per step.
+        /// When this is > 1, there are multiple iterations of this pass executed.
+        /// 
+        /// When multiple passes are executed the timestep is divded by the amount of iterations and then the simulation is executed with multiple iterations.
+        /// </summary>
+        public int iterationsPerStep = 1;
+
         protected T simulation;
 
         /// <summary>
@@ -28,7 +36,24 @@ namespace VHair
             }
         }
 
+        /// <summary>
+        /// Empty, only here to make scripts toggleable in the editor >_>
+        /// </summary>
+        protected virtual void Update()
+        {
+
+        }
+
+        public virtual void SimulationStep(float timestep)
+        {
+            float t = timestep / (float)this.iterationsPerStep;
+            for (int i = 0; i < this.iterationsPerStep; i++)
+            {
+                this._SimulationStep(t);
+            }
+        }
+
         public abstract void InitializeSimulation();
-        public abstract void SimulationStep(float timestep);
+        protected abstract void _SimulationStep(float timestep);
     }
 }
