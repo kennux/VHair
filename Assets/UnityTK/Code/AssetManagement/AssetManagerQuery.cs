@@ -11,6 +11,56 @@ namespace UnityTK.AssetManagement
     public class AssetManagerQuery : IAssetManagerQuery
     {
         /// <summary>
+        /// Returns a pooled asset manager query with a tag-criteria matching the specifiedd tag.
+        /// This is a shorthand for retrieving a query from <see cref="AssetManagerQueryPool{T}"/> and manually calling <see cref="AddTagCriteria(string)"/>.
+        /// </summary>
+        /// <param name="tag">The tag the query should match for.</param>
+        public static AssetManagerQuery GetPooledTagQuery(string tag)
+        {
+            var query = AssetManagerQueryPool<AssetManagerQuery>.Get();
+            query.AddTagCriteria(tag);
+
+            return query;
+        }
+
+        /// <summary>
+        /// Returns a pooled asset manager query with a tag-criteria matching the specifiedd tag.
+        /// This is a shorthand for retrieving a query from <see cref="AssetManagerQueryPool{T}"/> and manually calling <see cref="AddNameCriteria(string)"/>.
+        /// </summary>
+        /// <param name="name">The name the query should match for.</param>
+        public static AssetManagerQuery GetPooledNameQuery(string name)
+        {
+            var query = AssetManagerQueryPool<AssetManagerQuery>.Get();
+            query.AddTagCriteria(name);
+
+            return query;
+        }
+
+        /// <summary>
+        /// Returns a pooled asset manager query with a tag-criteria matching the specifiedd tag.
+        /// This is a shorthand for retrieving a query from <see cref="AssetManagerQueryPool{T}"/> and manually calling <see cref="AddTypeCriteria{T}"/>.
+        /// </summary>
+        public static AssetManagerQuery GetPooledTypeQuery<T>() where T : UnityEngine.Object
+        {
+            var query = AssetManagerQueryPool<AssetManagerQuery>.Get();
+            query.AddTypeCriteria<T>();
+
+            return query;
+        }
+
+        /// <summary>
+        /// Returns a pooled asset manager query with a tag-criteria matching the specifiedd tag.
+        /// This is a shorthand for retrieving a query from <see cref="AssetManagerQueryPool{T}"/> and manually calling <see cref="AddTypeCriteria(Type)"/>.
+        /// </summary>
+        public static AssetManagerQuery GetPooledTypeQuery(Type type)
+        {
+            var query = AssetManagerQueryPool<AssetManagerQuery>.Get();
+            query.AddTypeCriteria(type);
+
+            return query;
+        }
+
+        /// <summary>
         /// The tag filter criteria.
         /// Selected assets need to have all of those tags.
         /// </summary>
@@ -21,6 +71,12 @@ namespace UnityTK.AssetManagement
         /// Selected assets will have one of those names.
         /// </summary>
         protected HashSet<string> names = new HashSet<string>();
+
+        /// <summary>
+        /// The types filter criteria.
+        /// Selected assets will always be of atleast one of the types specified.
+        /// </summary>
+        protected HashSet<System.Type> types = new HashSet<Type>();
         
         /// <summary>
         /// Adds the specified tag to the list of required tags (<see cref="tags"/>).
@@ -38,6 +94,23 @@ namespace UnityTK.AssetManagement
         {
             HashSetPool<string>.GetIfNull(ref this.names);
             this.names.Add(name);
+        }
+
+        /// <summary>
+        /// Adds the specified type as type-criteria to this query.
+        /// </summary>
+        public void AddTypeCriteria<T>() where T : UnityEngine.Object
+        {
+            AddTypeCriteria(typeof(T));
+        }
+
+        /// <summary>
+        /// Non-generic version of <see cref="AddTypeCriteria{T}"/>.
+        /// </summary>
+        public void AddTypeCriteria(Type type)
+        {
+            HashSetPool<Type>.GetIfNull(ref this.types);
+            this.types.Add(type);
         }
 
         /// <summary>
@@ -82,6 +155,13 @@ namespace UnityTK.AssetManagement
             if (!ReferenceEquals(this.names, null) && this.names.Count > 0)
             {
                 if (!this.names.Contains(asset.name))
+                    return false;
+            }
+
+            // Look for type
+            foreach (var t in this.types)
+            {
+                if (ReferenceEquals(asset, null) || !t.IsAssignableFrom(asset.GetType()))
                     return false;
             }
 

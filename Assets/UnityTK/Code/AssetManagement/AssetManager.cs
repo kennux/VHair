@@ -32,6 +32,11 @@ namespace UnityTK.AssetManagement
             {
                 if (Essentials.UnityIsNull(_instance))
                 {
+                    // Try to find a (not yet) registered manager object in the scene
+                    _instance = FindObjectOfType<AssetManager>();
+                    if (!Essentials.UnityIsNull(_instance))
+                        return _instance;
+
                     var go = new GameObject("_AssetManager_");
 
                     try

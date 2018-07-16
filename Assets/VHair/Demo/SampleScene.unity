@@ -521,6 +521,7 @@ GameObject:
   - component: {fileID: 1588039616}
   - component: {fileID: 1588039615}
   - component: {fileID: 1588039614}
+  - component: {fileID: 1588039620}
   - component: {fileID: 1588039613}
   - component: {fileID: 1588039612}
   m_Layer: 0
@@ -555,6 +556,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   colliders:
   - {fileID: 1996441018}
 --- !u!114 &1588039613
@@ -582,8 +584,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
+  simulation: {fileID: 0}
   stiffness: 12
-  vertexRange: 8
+  vertexRange: 3
 --- !u!114 &1588039615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,7 +599,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   stiffness: 25
+  lengths: []
 --- !u!114 &1588039616
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -609,6 +614,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  gravityStrength: 2
 --- !u!114 &1588039617
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -664,6 +670,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   asset: {fileID: 11400000, guid: d1d636e948ac44e49904bfa5d3842a75, type: 2}
+--- !u!114 &1588039620
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1588039610}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38efe140835538c48b8f561254044428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iterationsPerStep: 1
+  stiffness: 12
 --- !u!1 &1591380294
 GameObject:
   m_ObjectHideFlags: 0
@@ -736,6 +755,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  gravityStrength: 1
 --- !u!114 &1591380299
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -779,7 +799,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   stiffness: 25
+  lengths: []
 --- !u!114 &1591380301
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -792,6 +814,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   colliders:
   - {fileID: 1996441018}
 --- !u!114 &1591380302
@@ -806,6 +829,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
+  simulation: {fileID: 0}
   stiffness: 18
   vertexRange: 3
 --- !u!114 &1591380303
@@ -835,6 +859,7 @@ GameObject:
   - component: {fileID: 1661294702}
   - component: {fileID: 1661294701}
   - component: {fileID: 1661294700}
+  - component: {fileID: 1661294706}
   - component: {fileID: 1661294699}
   - component: {fileID: 1661294698}
   m_Layer: 0
@@ -869,6 +894,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   colliders:
   - {fileID: 1996441018}
 --- !u!114 &1661294699
@@ -896,6 +922,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
+  simulation: {fileID: 0}
   stiffness: 12
   vertexRange: 8
 --- !u!114 &1661294701
@@ -910,7 +937,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   stiffness: 25
+  lengths: []
 --- !u!114 &1661294702
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -923,6 +952,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  gravityStrength: 1
 --- !u!114 &1661294703
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -978,6 +1008,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   asset: {fileID: 11400000, guid: 37ea80f6f8a84134a8724d08f91b91a5, type: 2}
+--- !u!114 &1661294706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1661294696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38efe140835538c48b8f561254044428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iterationsPerStep: 1
+  stiffness: 0
 --- !u!1 &1708945335
 GameObject:
   m_ObjectHideFlags: 0
@@ -1226,6 +1269,7 @@ GameObject:
   - component: {fileID: 2002508675}
   - component: {fileID: 2002508674}
   - component: {fileID: 2002508673}
+  - component: {fileID: 2002508679}
   - component: {fileID: 2002508672}
   - component: {fileID: 2002508671}
   m_Layer: 0
@@ -1260,6 +1304,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   colliders:
   - {fileID: 1996441018}
 --- !u!114 &2002508672
@@ -1287,6 +1332,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
+  simulation: {fileID: 0}
   stiffness: 12
   vertexRange: 8
 --- !u!114 &2002508674
@@ -1301,7 +1347,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  simulation: {fileID: 0}
   stiffness: 25
+  lengths: []
 --- !u!114 &2002508675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1314,6 +1362,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
+  gravityStrength: 1
 --- !u!114 &2002508676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,3 +1418,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   asset: {fileID: 11400000, guid: b9f6f0ea9b482b949afce99af001991e, type: 2}
+--- !u!114 &2002508679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2002508669}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 38efe140835538c48b8f561254044428, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iterationsPerStep: 1
+  stiffness: 0

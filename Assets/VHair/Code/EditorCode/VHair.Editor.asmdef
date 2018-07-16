@@ -1,0 +1,14 @@
+{
+    "name": "VHair.Editor",
+    "references": [
+        "UnityTK.Editor",
+        "UnityTK",
+        "VHair"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

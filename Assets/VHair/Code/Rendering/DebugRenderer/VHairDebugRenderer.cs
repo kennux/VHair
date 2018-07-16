@@ -69,7 +69,7 @@ namespace VHair
             mesh.UploadMeshData(false);
         }
 
-        public void Update()
+        public void LateUpdate()
         {
             this.UpdateMesh();
             Graphics.DrawMesh(this.mesh, Matrix4x4.identity, this.material, this.gameObject.layer);

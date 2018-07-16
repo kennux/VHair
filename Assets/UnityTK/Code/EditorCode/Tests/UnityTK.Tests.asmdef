@@ -1,0 +1,14 @@
+{
+    "name": "UnityTK.Tests",
+    "references": [
+        "UnityTK"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

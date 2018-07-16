@@ -1,0 +1,10 @@
+{
+    "name": "VHair",
+    "references": [
+        "UnityTK"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}

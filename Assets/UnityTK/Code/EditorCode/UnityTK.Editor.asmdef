@@ -1,0 +1,12 @@
+{
+    "name": "UnityTK.Editor",
+    "references": [
+        "UnityTK"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false
+}
