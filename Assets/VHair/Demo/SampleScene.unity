@@ -325,7 +325,7 @@ WindZone:
   m_Enabled: 1
   m_Mode: 0
   m_Radius: 20
-  m_WindMain: 0.1
+  m_WindMain: 0.4
   m_WindTurbulence: 1
   m_WindPulseMagnitude: 0.5
   m_WindPulseFrequency: 0.01
@@ -571,7 +571,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1588039610}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0dd4caf82c4169e44a680a32c717bf1a, type: 3}
   m_Name: 
@@ -686,7 +686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 1
-  stiffness: 0.5
+  stiffness: 20
   debugGlobalTransform: 0
   debugLocalTransform: 0
   debugRealtime: 0
@@ -907,7 +907,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1661294696}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0dd4caf82c4169e44a680a32c717bf1a, type: 3}
   m_Name: 
@@ -926,7 +926,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
-  stiffness: 12
+  stiffness: 24
   vertexRange: 4
 --- !u!114 &1661294701
 MonoBehaviour:
@@ -1021,8 +1021,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38efe140835538c48b8f561254044428, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iterationsPerStep: 2
-  stiffness: 0.5
+  iterationsPerStep: 1
+  stiffness: 45
   debugGlobalTransform: 0
   debugLocalTransform: 0
   debugRealtime: 0
@@ -1318,7 +1318,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 2002508669}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0dd4caf82c4169e44a680a32c717bf1a, type: 3}
   m_Name: 
@@ -1337,8 +1337,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iterationsPerStep: 2
-  stiffness: 12
-  vertexRange: 4
+  stiffness: 24
+  vertexRange: 5
 --- !u!114 &2002508674
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1432,8 +1432,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 38efe140835538c48b8f561254044428, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  iterationsPerStep: 2
-  stiffness: 0.5
+  iterationsPerStep: 1
+  stiffness: 45
   debugGlobalTransform: 0
   debugLocalTransform: 0
   debugRealtime: 0
