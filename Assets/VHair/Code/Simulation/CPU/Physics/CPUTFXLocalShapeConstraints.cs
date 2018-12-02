@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,56 +7,117 @@ namespace VHair
 {
     public class CPUTFXLocalShapeConstraints : HairSimulationPass<CPUTFXPhysicsSimulation>
     {
+		// Settings
         public float stiffness;
+		public bool debugGlobalTransform;
+		public bool debugLocalTransform;
+		public bool debugRealtime;
+		public int debugSteps = 16;
+		
+		// Local
+		[NonSerialized]
+		[HideInInspector]
+        public Quaternion[] localTransform;
 
-        private Quaternion[] initialLocalTransform;
-        private Quaternion[] prevFrameLocalTransform;
-        private Quaternion[] currentLocalTransform;
+		// Global
+		[NonSerialized]
+		[HideInInspector]
+        public Quaternion[] globalTransform;
+		[NonSerialized]
+		[HideInInspector]
+        public Quaternion[] realtimeDebug;
+
+		// Other
+        private Vector3[] referenceVectors;
 
         public override void InitializeSimulation()
         {
-            this.initialLocalTransform = new Quaternion[this.instance.vertexCount];
-            this.prevFrameLocalTransform = new Quaternion[this.instance.vertexCount];
-            this.currentLocalTransform = new Quaternion[this.instance.vertexCount];
+            this.localTransform = new Quaternion[this.instance.vertexCount];
+            this.globalTransform = new Quaternion[this.instance.vertexCount];
+            this.realtimeDebug = new Quaternion[this.instance.vertexCount];
+            this.referenceVectors = new Vector3[this.instance.vertexCount];
 
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            this.CalculateTransforms(strands, vertices, this.initialLocalTransform);
+			for (int i = 0; i < this.instance.vertexCount; i++)
+			{
+				this.localTransform[i] = Quaternion.identity;
+				this.globalTransform[i] = Quaternion.identity;
+				this.realtimeDebug[i] = Quaternion.identity;
+				this.referenceVectors[i] = Vector3.zero;
+			}
 
-            System.Array.Copy(this.initialLocalTransform, this.prevFrameLocalTransform, this.initialLocalTransform.Length);
-            System.Array.Copy(this.initialLocalTransform, this.currentLocalTransform, this.initialLocalTransform.Length);
+            HairStrand[] strands = this.instance.asset.GetStrandData();
+            Vector3[] vertices = this.instance.asset.GetVertexData();
+            this.CalculateTransforms(strands, vertices, this.localTransform, this.globalTransform, this.referenceVectors);
         }
 
-        private void CalculateTransforms(HairStrand[] strands, Vector3[] vertices, Quaternion[] transforms)
+        private void CalculateTransforms(HairStrand[] strands, Vector3[] vertices, Quaternion[] localTransforms, Quaternion[] globalTransforms, Vector3[] referenceVectors)
         {
             for (int i = 0; i < strands.Length; i++)
             {
-                Quaternion prev = Quaternion.identity;
                 HairStrand strand = strands[i];
                 int j;
-                for (j = strand.firstVertex; j < strand.lastVertex; j++)
+
+				// First vertex
+				Quaternion local;
+				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation((vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]).normalized);
+
+                for (j = strand.firstVertex+1; j < strand.lastVertex; j++)
                 {
-                    Vector3 p1 = vertices[j], p2 = vertices[j + 1];
-                    prev = Quaternion.Inverse(prev) * Quaternion.LookRotation((p2 - p1).normalized);
+                    Vector3 p1 = vertices[j-1], p2 = vertices[j], d = (p2 - p1);
+					Vector3 vec = Quaternion.Inverse(globalTransforms[j - 1]) * d;
+					if (vec.magnitude < 0.001f)
+						local = Quaternion.identity;
+					else
+						local = Quaternion.LookRotation(vec.normalized);
 
-                    transforms[j] = prev;
+					referenceVectors[j] = vec;
+					globalTransforms[j] = globalTransforms[j-1] * local;
+                    localTransforms[j] = local;
                 }
-
-                transforms[j] = transforms[strand.firstVertex]; // Set last to transform before
             }
         }
 
         protected override void _SimulationStep(float timestep)
         {
+			float stiffness = .5f * Mathf.Min(this.stiffness * timestep, .95f);
             HairStrand[] strands = this.instance.strands.cpuReference;
             Vector3[] vertices = this.instance.vertices.cpuReference;
+			uint[] movability = this.instance.movability.cpuReference;
+			Quaternion rotation = this.transform.rotation;
+			
+			// Apply local shape constraint
             for (int i = 0; i < strands.Length; i++)
             {
                 HairStrand strand = strands[i];
-                for (int j = strand.firstVertex; j < strand.lastVertex; j++)
+				Quaternion rotGlobal = this.globalTransform[strand.firstVertex];
+				
+				realtimeDebug[strand.firstVertex] = rotGlobal;
+                for (int j = strand.firstVertex+1; j < strand.lastVertex-1; j++)
                 {
+					Quaternion rotGlobalWorld = rotation*rotGlobal;
+
+					Vector3 p1 = vertices[j], p2 = vertices[j + 1];
+					Vector3 orgP2 = rotGlobalWorld * this.referenceVectors[j+1] + p1;
+					Vector3 delta = stiffness * (orgP2 - p2);
+
+					if (HairMovability.IsMovable(j, movability))
+						p1 -= delta;
+					if (HairMovability.IsMovable(j + 1, movability))
+						p2 += delta;
+
+					Vector3 vec = (p2 - p1);
+
+					if (vec.magnitude > 0.001f)
+						rotGlobal = rotGlobal * Quaternion.LookRotation((Quaternion.Inverse(rotGlobalWorld) * vec).normalized);
+
+					vertices[j] = p1;
+					vertices[j+1] = p2;
+					realtimeDebug[j] = rotGlobal;
                 }
+				realtimeDebug[strand.lastVertex] = rotGlobal;
             }
+
+			this.instance.vertices.SetGPUDirty();
         }
     }
 }

@@ -19,6 +19,8 @@ namespace VHair
         [HideInInspector]
         public Matrix4x4 prevFrameMatrix;
 
+		public float timestepScale = 1;
+
         protected override void Start()
         {
             base.Start();
@@ -37,7 +39,7 @@ namespace VHair
 
         protected override void _Update(float timestep)
         {
-            base._Update(timestep);
+            base._Update(timestep * this.timestepScale);
 
             System.Array.Copy(this.instance.vertices.cpuReference, this.prevFrameVertices, this.instance.asset.vertexCount);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
