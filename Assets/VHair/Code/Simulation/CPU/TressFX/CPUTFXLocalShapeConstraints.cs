@@ -106,10 +106,8 @@ namespace VHair
 						p2 += delta;
 
 					Vector3 vec = (p2 - p1);
-
-					if (vec.magnitude > 0.001f)
-						rotGlobal = rotGlobal * Quaternion.LookRotation((Quaternion.Inverse(rotGlobalWorld) * vec).normalized);
-
+					
+					rotGlobal = rotGlobal * Quaternion.LookRotation((Quaternion.Inverse(rotGlobalWorld) * vec).normalized);
 					vertices[j] = p1;
 					vertices[j+1] = p2;
 					realtimeDebug[j] = rotGlobal;

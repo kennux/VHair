@@ -47,12 +47,12 @@ namespace VHair
                     posWS = matrix.MultiplyPoint3x4(lastFramePosOS);
 
                     // Unoptimized: 
-                    // newPos = posWS + (posWS - lastFramePosWS) + (gravity * (timestep * timestep));
+                    // newPos = posWS + (lastFramePosWS - posWS) + (gravity * (timestep * timestep));
 
                     // Optimized version:
-                    newPos.x = posWS.x + (posWS.x - lastFramePosWS.x) + (gravity.x * timestepSqr);
-                    newPos.y = posWS.y + (posWS.y - lastFramePosWS.y) + (gravity.y * timestepSqr);
-                    newPos.z = posWS.z + (posWS.z - lastFramePosWS.z) + (gravity.z * timestepSqr);
+                    newPos.x = posWS.x + (lastFramePosWS.x - posWS.x) + (gravity.x * timestepSqr);
+                    newPos.y = posWS.y + (lastFramePosWS.y - posWS.y) + (gravity.y * timestepSqr);
+                    newPos.z = posWS.z + (lastFramePosWS.z - posWS.z) + (gravity.z * timestepSqr);
 
                     vertices[i] = newPos;
                 }

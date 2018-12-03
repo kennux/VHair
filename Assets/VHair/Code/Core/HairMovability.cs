@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
+using Unity.Collections;
 
 namespace VHair
 {
@@ -44,6 +45,33 @@ namespace VHair
         /// <param name="movability">The movability data</param>
         /// <returns>Whether or not this vertex is movable.</returns>
         public static bool IsMovable(int index, uint[] movability)
+        {
+            int dataIndex = (int)(index / 32f); // Mathf.FloorToInt(index / 32f);
+            return (movability[dataIndex] & (1u << (index % 32))) != 0;
+        }
+
+        /// <summary>
+        /// Helper method of setting movability bits in the specified data array.
+        /// </summary>
+        /// <param name="index">The vertex index to set</param>
+        /// <param name="isMovable">The flag state to set</param>
+        /// <param name="movability">Movability data, previously created with <see cref="CreateData(int)"/></param>
+        public static void SetMovable(int index, bool isMovable, NativeArray<uint> movability)
+        {
+            int dataIndex = (int)(index / 32f); // Mathf.FloorToInt(index / 32f);
+            if (isMovable)
+                movability[dataIndex] |= (1u << (index % 32));
+            else
+                movability[dataIndex] &= ~(1u << (index % 32));
+        }
+
+        /// <summary>
+        /// Returns whether or not the specified vertex index is set as movable in the specified movability data.
+        /// </summary>
+        /// <param name="index">The vertex index</param>
+        /// <param name="movability">The movability data</param>
+        /// <returns>Whether or not this vertex is movable.</returns>
+        public static bool IsMovable(int index, NativeArray<uint> movability)
         {
             int dataIndex = (int)(index / 32f); // Mathf.FloorToInt(index / 32f);
             return (movability[dataIndex] & (1u << (index % 32))) != 0;
