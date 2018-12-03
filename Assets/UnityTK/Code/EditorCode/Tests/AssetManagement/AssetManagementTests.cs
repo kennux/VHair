@@ -3,8 +3,9 @@ using UnityEditor;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using UnityTK.AssetManagement;
 
-namespace UnityTK.AssetManagement.Editor.Test
+namespace UnityTK.Test.AssetManagement
 {
     public class AssetManagementTests
     {

@@ -2,8 +2,9 @@
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using UnityTK.DataBinding;
 
-namespace UnityTK.DataBinding.Editor.Test
+namespace UnityTK.Test.DataBinding
 {
     public class DataBindingRootsTest
     {

@@ -45,5 +45,10 @@ namespace UnityTK.DataBinding
         {
             return this.parentNode.GetFieldValue(this.field);
         }
+
+        public override string ToString()
+        {
+            return string.Format("{0} - field: {1}", base.ToString(), this.field);
+        }
     }
 }

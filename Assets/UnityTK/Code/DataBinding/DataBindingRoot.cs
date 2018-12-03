@@ -17,6 +17,21 @@ namespace UnityTK.DataBinding
         public UnityEngine.Object target;
 
         /// <summary>
+        /// The update framerate.
+        /// </summary>
+        public int updateFramerate = 20;
+
+        /// <summary>
+        /// The update time calculated from <see cref="updateFramerate"/>
+        /// </summary>
+        private float updateTime { get { return 1f / (float)this.updateFramerate; } }
+
+        /// <summary>
+        /// Time passed since last update
+        /// </summary>
+        private float _time;
+
+        /// <summary>
         /// Returns null always, since roots dont have a parent.
         /// </summary>
         public override DataBinding parent
@@ -43,7 +58,13 @@ namespace UnityTK.DataBinding
 
         public void Update()
         {
-            this.UpdateBinding();
+            this._time += Time.deltaTime;
+
+            if (this._time > this.updateTime)
+            {
+                this.UpdateBinding();
+                this._time = 0;
+            }
         }
     }
 }

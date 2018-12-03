@@ -102,33 +102,36 @@ namespace UnityTK.Benchmarking
         #endregion
 
         /// <summary>
-        /// Builds a report as human readable string for this benchmark.
+        /// Retrieves label data in a list of results labels.
         /// </summary>
-        /// <returns>The report string.</returns>
-        public string GetReportString()
+        /// <param name="preAlloc">Pre-allocated list for the result labels. Will be drawn from pool if not existing yet.</param>
+        /// <returns>preAlloc</returns>
+        public List<BenchmarkResultLabel> GetLabels(List<BenchmarkResultLabel> preAlloc = null)
         {
-            StringBuilder labelsReport = new StringBuilder();
-            _LabelsReportRecursive(labelsReport, this.currentLabel);
+            ListPool<BenchmarkResultLabel>.GetIfNull(ref preAlloc);
 
-            return string.Format("Milliseconds: {0}\r\nTotal Milliseconds: {1}\r\nOverhead Milliseconds: {2}\r\nLabels:\r\n{3}", this.milliseconds, this.totalMilliseconds, this.overheadMilliseconds, labelsReport.ToString());
+            _GetLabelsRecursive(this.currentLabel, preAlloc);
+
+            return preAlloc;
         }
 
-        private void _LabelsReportRecursive(StringBuilder labelsReport, Label label, int depth = 0)
+        /// <summary>
+        /// Recursive label builder method for <see cref="GetLabels(List{BenchmarkResultLabel})"/>
+        /// </summary>
+        private void _GetLabelsRecursive(Label label, List<BenchmarkResultLabel> output)
         {
-            for (int i = 0; i < depth; i++)
-                labelsReport.Append("\t");
-            labelsReport.AppendFormat("{0}: {1} ms", label.label, label.stopwatch.Elapsed.TotalMilliseconds);
-            labelsReport.AppendLine();
-
-            // Children recursion
-            foreach (var _label in label.children)
+            var c = new List<BenchmarkResultLabel>();
+            output.Add(new BenchmarkResultLabel()
             {
-                _LabelsReportRecursive(labelsReport, _label, depth+1);
-            }
-        }
+                label = label.label,
+                time = label.stopwatch.Elapsed.TotalMilliseconds,
+                children = c
+            });
 
-        private void _LabelReport(StringBuilder sb, Label label, int depth)
-        {
+            foreach (var child in label.children)
+            {
+                _GetLabelsRecursive(child, c);
+            }
         }
 
         /// <summary>

@@ -15,11 +15,18 @@ namespace UnityTK
         private T obj;
         private Component _checked;
 
-        public T Get(Component comp)
+        public T Get(Component comp, bool checkParents = false, bool checkChildren = false)
         {
             if (!object.ReferenceEquals(comp, this._checked))
             {
                 this.obj = comp.GetComponent<T>();
+
+                // Additional checks
+                if (checkParents && ReferenceEquals(this.obj, null))
+                    this.obj = comp.GetComponentInParent<T>();
+                if (checkChildren && ReferenceEquals(this.obj, null))
+                    this.obj = comp.GetComponentInChildren<T>();
+
                 this._checked = comp;
             }
             return obj;

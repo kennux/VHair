@@ -116,5 +116,14 @@ namespace UnityTK.DataBinding
         /// Returns the return type of the specified method.
         /// </summary>
         public abstract System.Type GetMethodReturnType(string method);
+
+        /// <summary>
+        /// Custom string conversion for databinding nodes.
+        /// </summary>
+        /// <returns>A string with format {0} - {1} with 0 = base.ToString(), 1 = this.boundType.ToString()</returns>
+        public override string ToString()
+        {
+            return string.Format("{0} - {1}", base.ToString(), this.boundType.Name);
+        }
     }
 }

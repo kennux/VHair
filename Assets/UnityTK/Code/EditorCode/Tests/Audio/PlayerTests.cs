@@ -3,8 +3,9 @@ using UnityEditor;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using UnityTK.Audio;
 
-namespace UnityTK.Audio.Editor.Test
+namespace UnityTK.Test.Audio
 {
     public class PlayerTests
     {

@@ -5,8 +5,9 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityTK.DataBinding;
 
-namespace UnityTK.DataBinding.Editor.Test
+namespace UnityTK.Test.DataBinding
 {
     public class DataBindingLeavesTest
     {
@@ -143,7 +144,7 @@ namespace UnityTK.DataBinding.Editor.Test
             foreach (var element in collectionLeaf.GetComponentsInChildren<DataBindingCollectionElement>())
             {
                 // Awake leaves
-                foreach (var leaf in element.GetComponentsInChildren<DataBinding>())
+                foreach (var leaf in element.GetComponentsInChildren<UnityTK.DataBinding.DataBinding>())
                     leaf.Awake();
 
                 // Update element

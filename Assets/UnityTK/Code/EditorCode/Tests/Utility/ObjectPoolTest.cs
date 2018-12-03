@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using UnityTK;
 using System;
 
-namespace UnityTK.Test
+namespace UnityTK.Test.Utility
 {
     public class ObjectPoolTest
     {

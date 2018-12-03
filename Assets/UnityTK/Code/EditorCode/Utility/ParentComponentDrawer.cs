@@ -46,7 +46,7 @@ namespace UnityTK.Editor
 
             // Gather info
             var valueComponent = value as Component;
-            var availableComponents = go.GetComponentsInParent(attrib.targetType).Concat(go.GetComponents(attrib.targetType)).Distinct().Where((c) => !object.ReferenceEquals(self, c)).ToArray();
+            var availableComponents = go.GetComponentsInParent(attrib.targetType, true).Concat(go.GetComponents(attrib.targetType)).Distinct().Where((c) => !object.ReferenceEquals(self, c)).ToArray();
             var availableComponentsStr = new string[] { "NULL", }.Concat(availableComponents.Select((c) => c.ToString())).ToArray();
             var currentlySelected = property.objectReferenceValue;
             int currentlySelectedIndex = System.Array.IndexOf(availableComponents, valueComponent) + 1;

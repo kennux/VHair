@@ -24,7 +24,7 @@ namespace UnityTK.Benchmarking
 
             // Setup benchmark result and start initial label
             BenchmarkResult res = new BenchmarkResult();
-            res.BeginLabel(this.GetType().Name);
+            res.BeginLabel("Profiling");
 
             // Run benchmark
             this.RunBenchmark(res);

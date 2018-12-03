@@ -16,11 +16,11 @@ namespace UnityTK
         /// Represents a single element of a linked list.
         /// Implements the doubly-linked list similar to .Net's linked list.
         /// </summary>
-        public class LinkedListElement<T>
+        public class LinkedListElement
         {
             public T value;
-            public LinkedListElement<T> prev;
-            public LinkedListElement<T> next;
+            public LinkedListElement prev;
+            public LinkedListElement next;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace UnityTK
                 }
             }
 
-            private LinkedListElement<T> _current;
+            private LinkedListElement _current;
 
             public Enumerator(UTKLinkedList<T> list)
             {
@@ -89,25 +89,25 @@ namespace UnityTK
         /// Static list elements pool.
         /// TODO: Maybe an instance pooling mechnic (maybe even on top of this?) is more appropriate?
         /// </summary>
-        private static ObjectPool<LinkedListElement<T>> elementPool = new ObjectPool<LinkedListElement<T>>(() => new LinkedListElement<T>(), 10000);
+        private static ObjectPool<LinkedListElement> elementPool = new ObjectPool<LinkedListElement>(() => new LinkedListElement(), 10000);
 
         /// <summary>
         /// The first element in this linked list.
         /// </summary>
-        public LinkedListElement<T> first
+        public LinkedListElement first
         {
             get { return this._first; }
         }
-        private LinkedListElement<T> _first;
+        private LinkedListElement _first;
 
         /// <summary>
         /// The last element in this linked list.
         /// </summary>
-        public LinkedListElement<T> last
+        public LinkedListElement last
         {
             get { return this._last; }
         }
-        private LinkedListElement<T> _last;
+        private LinkedListElement _last;
 
         /// <summary>
         /// The amount of elements in this linked list.
@@ -198,7 +198,7 @@ namespace UnityTK
         /// <param name="element">The element after which to insert value.</param>
         /// <param name="value">The value to insert.</param>
         /// <param name="before">Whether or not to insert the specifiedd value before or after the specified element.</param>
-        public void Insert(LinkedListElement<T> element, T value, bool before = true)
+        public void Insert(LinkedListElement element, T value, bool before = true)
         {
             var newElement = elementPool.Get();
             newElement.value = value;
@@ -247,7 +247,7 @@ namespace UnityTK
         /// </summary>
         public void Clear()
         {
-            LinkedListElement<T> element = this.first;
+            LinkedListElement element = this.first;
             while (!ReferenceEquals(element, null))
             {
                 elementPool.Return(element);
@@ -262,7 +262,7 @@ namespace UnityTK
 
         public bool Contains(T item)
         {
-            LinkedListElement<T> element = this.first;
+            LinkedListElement element = this.first;
             while (!ReferenceEquals(element, null))
             {
                 // Equality comparison
@@ -278,7 +278,7 @@ namespace UnityTK
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            LinkedListElement<T> element = this.first;
+            LinkedListElement element = this.first;
             for (int i = arrayIndex; i < array.Length; i++)
             {
                 if (ReferenceEquals(element, null))
@@ -295,7 +295,7 @@ namespace UnityTK
         /// Removes the specified element by "ripping" it out of the linked list.
         /// </summary>
         /// <param name="element">The element to remove.</param>
-        public void RemoveElement(LinkedListElement<T> element)
+        public void RemoveElement(LinkedListElement element)
         {
             if (ReferenceEquals(element, null))
                 throw new ArgumentException("Element to remove cannot be null!");
@@ -324,7 +324,7 @@ namespace UnityTK
         public bool Remove(T item)
         {
             bool found = false;
-            LinkedListElement<T> element = this.first;
+            LinkedListElement element = this.first;
             while (!ReferenceEquals(element, null))
             {
                 // Equality comparison

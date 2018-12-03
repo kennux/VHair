@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Text;
+using UnityEditor.IMGUI.Controls;
 
 namespace UnityTK.Benchmarking.Editor
 {
@@ -12,21 +13,12 @@ namespace UnityTK.Benchmarking.Editor
     /// </summary>
     public class BenchmarkingWindow : EditorWindow
     {
-        public class BenchmarkEntry
-        {
-            public bool isSelected;
-            public BenchmarkResult result;
-            public MonoScript script;
-
-            public BenchmarkEntry(MonoScript script)
-            {
-                this.script = script;
-                this.result = null;
-                this.isSelected = false;
-            }
-        }
-
-        private const string gameObjectName = "_UnityTK_Benchmark_";
+        ///<summary>
+        /// SerializeField is used to ensure the view state is written to the window 
+        /// layout file. This means that the state survives restarting Unity as long as the window
+        /// is not closed. If the attribute is omitted then the state is still serialized/deserialized.
+        /// </summary>
+        [SerializeField] TreeViewState treeViewState;
 
         [MenuItem("Window/UnityTK/Benchmarking")]
         static void Init()
@@ -36,100 +28,60 @@ namespace UnityTK.Benchmarking.Editor
             window.Show();
         }
 
-        private List<BenchmarkEntry> benchmarks;
+        private BenchmarkingTreeView treeView;
 
         protected void OnEnable()
         {
             this.titleContent = new GUIContent("Benchmarking");
 
-            // Setup window data
-            // This setup is split in seperate steps to make debugging easier
-            string[] assets = AssetDatabase.FindAssets("t:MonoScript");
-            List<MonoScript> scripts = assets.Select((guid) => AssetDatabase.LoadAssetAtPath(AssetDatabase.GUIDToAssetPath(guid), typeof(MonoScript))).Cast<MonoScript>().ToList();
-            this.benchmarks = scripts.Where((script) =>
-            {
-                var type = script.GetClass();
-                if (ReferenceEquals(type, null))
-                    return false;
-                return !type.IsAbstract && typeof(Benchmark).IsAssignableFrom(type);
-            }).Select((script) => new BenchmarkEntry(script)).ToList();
-        }
+            if (treeViewState == null)
+                treeViewState = new TreeViewState();
 
-        protected void Run(IEnumerable<BenchmarkEntry> benchmarks)
-        {
-            // Load temporary scene
-            // TODO
-
-            // Create GO for all benchmarks
-            GameObject benchmarksGo = new GameObject(gameObjectName);
-
-            try
-            {
-                // Create benchmarks
-                Dictionary<BenchmarkEntry, Benchmark> instantiated = new Dictionary<BenchmarkEntry, Benchmark>();
-                foreach (var benchmark in benchmarks)
-                {
-                    instantiated.Add(benchmark, benchmarksGo.AddComponent(benchmark.script.GetClass()) as Benchmark);
-                }
-
-                // Run benchmarks
-                foreach (var kvp in instantiated)
-                {
-                    kvp.Key.result = kvp.Value.Run();
-                }
-            }
-            finally
-            {
-                DestroyImmediate(benchmarksGo);
-            }
-
-            // Reload old scene setup
-            // TODO
+            treeView = new BenchmarkingTreeView(treeViewState);
         }
 
         protected void OnGUI()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.BeginVertical();
-            GUILayout.Label("Benchmarking", EditorStyles.boldLabel);
-
-            // Render out all benchmarks
-            foreach (var benchmark in this.benchmarks)
-            {
-                benchmark.isSelected = GUILayout.Toggle(benchmark.isSelected, benchmark.script.GetClass().Name);
-            }
-
-            // Actions
-            if (GUILayout.Button("Reload"))
-            {
-                this.OnEnable();
-            }
             if (GUILayout.Button("Run selected"))
             {
-                Run(this.benchmarks.Where((b) => b.isSelected));
+                Benchmark(this.treeView.GetSelectedItems());
+                this.treeView.Reload();
             }
             if (GUILayout.Button("Run all"))
             {
-                Run(this.benchmarks);
+                Benchmark(this.treeView.GetAllItems());
+                this.treeView.Reload();
             }
-
-            GUILayout.EndVertical();
-            GUILayout.BeginVertical();
-
-            StringBuilder sb = new StringBuilder();
-            foreach (var benchmark in this.benchmarks.Where((b) => b.isSelected && !ReferenceEquals(b.result, null)))
+            if (GUILayout.Button("Reload"))
             {
-                sb.AppendLine("Benchmark " + benchmark.script.name);
-                sb.AppendLine("-------------------------------------------------");
-                sb.AppendLine(benchmark.result.GetReportString());
-
-                sb.AppendLine();
-                sb.AppendLine();
+                this.treeViewState = new TreeViewState();
+                this.treeView = new BenchmarkingTreeView(this.treeViewState);
             }
-            GUILayout.TextArea(sb.ToString(), GUILayout.ExpandWidth(true));
-
-            GUILayout.EndVertical();
             GUILayout.EndHorizontal();
+
+            // Draw tree view
+            treeView.OnGUI(new Rect(0, 30, position.width, position.height));
+        }
+
+        private void Benchmark(List<BenchmarkingTreeView.BenchmarkItem> items)
+        {
+            List<System.Type> scriptTypes = new List<System.Type>();
+            List<BenchmarkResult> results = new List<BenchmarkResult>();
+
+            foreach (var item in items)
+            {
+                scriptTypes.Add(item.script.GetClass());
+            }
+
+            System.GC.Collect();
+            BenchmarkRunner.RunBenchmark(scriptTypes, results);
+            System.GC.Collect();
+
+            for (int i = 0; i < items.Count; i++)
+            {
+                items[i].result = results[i];
+            }
         }
     }
 }

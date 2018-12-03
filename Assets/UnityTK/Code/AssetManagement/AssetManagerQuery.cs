@@ -129,7 +129,7 @@ namespace UnityTK.AssetManagement
         /// </summary>
         public virtual bool MatchesCriterias(IManagedAsset asset)
         {
-            if (!ReferenceEquals(this.tags, null) && this.tags.Count > 0)
+            if (!ReferenceEquals(this.tags, null) && this.tags.Count > 0 && !ReferenceEquals(asset.tags, null))
             {
                 var tags = asset.tags;
                 for (int i = 0; i < this.tags.Count; i++)

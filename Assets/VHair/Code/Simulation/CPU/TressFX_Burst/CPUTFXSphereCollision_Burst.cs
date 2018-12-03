@@ -35,11 +35,11 @@ namespace VHair
 
                         // Intersection?
                         float3 dir = (v - c.center);
-                        float sqrMag = math.lengthsq(dir);
-                        if (sqrMag <= c.radiusSq) // if (Vector3.Distance(v, c.center) <= c.radius)
+                        float sqMag = math.lengthsq(dir);
+                        if (sqMag <= c.radiusSq) // if (Vector3.Distance(v, c.center) <= c.radius)
                         {
                             // Intersection! push the vertex out
-                            float d = math.sqrt(sqrMag); // dir.magnitude;
+                            float d = math.sqrt(sqMag); // dir.magnitude;
                             v += (dir / d) * (c.radius - d);
                             wasModified = true;
                         }
@@ -68,15 +68,6 @@ namespace VHair
 				_colliders.Dispose();
 
 			_colliders = new NativeArray<CollisionSphere>(this.colliders.Length, Allocator.Persistent);
-            for (int i = 0; i < this.colliders.Length; i++)
-            {
-                _colliders[i] = new CollisionSphere()
-                {
-                    center = this.colliders[i].transform.TransformPoint(this.colliders[i].center),
-                    radius = this.colliders[i].radius,
-                    radiusSq = this.colliders[i].radius * this.colliders[i].radius
-                };
-            }
 		}
 
         public override void InitializeSimulation()
@@ -86,6 +77,17 @@ namespace VHair
 
         protected override void _SimulationStep(float timestep)
         {
+            for (int i = 0; i < this.colliders.Length; i++)
+            {
+				float radius = this.colliders[i].radius * Mathf.Max(Mathf.Max(this.colliders[i].transform.lossyScale.x, this.colliders[i].transform.lossyScale.y), this.colliders[i].transform.lossyScale.z);
+                _colliders[i] = new CollisionSphere()
+                {
+                    center = this.colliders[i].transform.TransformPoint(this.colliders[i].center),
+                    radius = radius,
+                    radiusSq = radius * radius
+                };
+            }
+
 			Job job = new Job()
 			{
 				colliders = _colliders,

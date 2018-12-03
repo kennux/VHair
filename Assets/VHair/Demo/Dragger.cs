@@ -6,7 +6,7 @@ public class Dragger : MonoBehaviour
     public Transform model;
     public float speed = 100;
 
-    public void Update()
+    public void FixedUpdate()
     {
         if (!Input.GetMouseButton(0))
             return;
@@ -16,8 +16,8 @@ public class Dragger : MonoBehaviour
 
         this.model.position = new Vector3
         (
-            this.model.position.x + (-mouseX * this.speed * Time.deltaTime),
-            this.model.position.y + (mouseY * this.speed * Time.deltaTime),
+            this.model.position.x + (-mouseX * this.speed * Time.fixedDeltaTime),
+            this.model.position.y + (mouseY * this.speed * Time.fixedDeltaTime),
             this.model.position.z
         );
     }

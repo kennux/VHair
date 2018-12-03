@@ -3,8 +3,9 @@ using UnityEditor;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
+using UnityTK.Audio;
 
-namespace UnityTK.Audio.Editor.Test
+namespace UnityTK.Test.Audio
 {
     public class EventTests
     {
@@ -19,7 +20,6 @@ namespace UnityTK.Audio.Editor.Test
             evt.minDistance = 1;
             evt.pitch = new RangedFloat(.5f, .75f);
             evt.rolloffMode = AudioRolloffMode.Linear;
-            AudioClip testClip = AudioClip.Create("test", 100, 4, 1000, false);
 
             bool playWasCalled = false;
             bool playWasLooped = false;

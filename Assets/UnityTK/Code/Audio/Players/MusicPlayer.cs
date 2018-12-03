@@ -43,6 +43,11 @@ namespace UnityTK.Audio
         public bool randomOrder;
 
         /// <summary>
+        /// The playback volume.
+        /// </summary>
+        public float volume = 1;
+
+        /// <summary>
         /// The <see cref="tracks"/> item that was played last time some playback started (i.e. the track that is currently playing).
         /// This is ignored when the player is running with <see cref="randomOrder"/> true.
         /// </summary>
@@ -163,12 +168,12 @@ namespace UnityTK.Audio
                 // Fade in
                 while (this.audioSource.time < this.currentTrack.fadeInTime)
                 {
-                    this.audioSource.volume = Mathf.Lerp(0, 1, this.currentTrack.fadeCurve.Evaluate(Mathf.Clamp01(this.audioSource.time / this.currentTrack.fadeInTime)));
+                    this.audioSource.volume = Mathf.Lerp(0, this.volume, this.currentTrack.fadeCurve.Evaluate(Mathf.Clamp01(this.audioSource.time / this.currentTrack.fadeInTime)));
 
                     // Wait one frame
                     yield return null;
                 }
-                this.audioSource.volume = 1;
+                this.audioSource.volume = this.volume;
 
                 // Wait for playback
                 float startBlend = this.currentTrack.clip.length - this.nextTrack.fadeInTime;
@@ -187,8 +192,8 @@ namespace UnityTK.Audio
                 while (this.audioSource.time < this.currentTrack.clip.length)
                 {
                     float currentTrackLeft = this.currentTrack.clip.length - this.audioSource.time;
-                    this.audioSource.volume = Mathf.Lerp(0, 1, this.currentTrack.fadeCurve.Evaluate(Mathf.Clamp01(currentTrackLeft / this.nextTrack.fadeInTime)));
-                    this.audioSourceNext.volume = Mathf.Lerp(1, 0, this.nextTrack.fadeCurve.Evaluate(Mathf.Clamp01(currentTrackLeft / this.nextTrack.fadeInTime)));
+                    this.audioSource.volume = Mathf.Lerp(0, this.volume, this.currentTrack.fadeCurve.Evaluate(Mathf.Clamp01(currentTrackLeft / this.nextTrack.fadeInTime)));
+                    this.audioSourceNext.volume = Mathf.Lerp(this.volume, 0, this.nextTrack.fadeCurve.Evaluate(Mathf.Clamp01(currentTrackLeft / this.nextTrack.fadeInTime)));
 
                     // Wait one frame
                     yield return null;

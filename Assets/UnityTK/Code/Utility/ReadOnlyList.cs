@@ -43,6 +43,15 @@ namespace UnityTK
         {
             this.list = list;
         }
+
+        /// <summary>
+        /// Implicit cast operator to create a new readonly list from a real list.
+        /// </summary>
+        /// <param name="list">The list to be written into read only wrapper</param>
+        public static implicit operator ReadOnlyList<T>(List<T> list)
+        {
+            return new ReadOnlyList<T>(list);
+        }
         
         public List<T>.Enumerator GetEnumerator()
         {

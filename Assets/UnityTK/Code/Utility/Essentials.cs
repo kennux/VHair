@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using System.Reflection.Emit;
+using System.Reflection;
 
 namespace UnityTK
 {
@@ -109,6 +111,19 @@ namespace UnityTK
             else
                 dict.Add(key, value);
         }
+
+		/// <summary>
+		/// Tries getting a value for the specified key.
+		/// If none could be found, default(TValue) is returned.
+		/// </summary>
+		public static TValue TryGet<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key)
+		{
+			TValue val;
+			if (dict.TryGetValue(key, out val))
+				return val;
+			return default(TValue);
+		}
+
         /// <summary>
         /// Gets the first component in parents.
         /// Returns default(T) if there was no component found.
@@ -123,6 +138,26 @@ namespace UnityTK
             if (transform.parent != null)
                 return GetFirstComponentInParents<T>(transform.parent);
             return default(T);
+        }
+
+        /// <summary>
+        /// Quick&dirty sorting method used to avoid .Net sorting methods (which of course allocate memory in most cases >_>) at runtime.
+        /// </summary>
+        /// <param name="list">The list to sort.</param>
+        public static void InsertionSort(List<int> list)
+        {
+            for (int i = 0; i < list.Count - 1; i++)
+            {
+                for (int j = i + 1; j > 0; j--)
+                {
+                    if (list[j - 1] > list[j])
+                    {
+                        int temp = list[j - 1];
+                        list[j - 1] = list[j];
+                        list[j] = temp;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -239,5 +274,26 @@ namespace UnityTK
                 return ms.ToArray();
             }
         }
+
+		// Internal list array accessor by https://stackoverflow.com/questions/4972951/listt-to-t-without-copying
+		static class ArrayAccessor<T>
+		{
+			public static Func<List<T>, T[]> Getter;
+
+			static ArrayAccessor()
+			{
+				var dm = new DynamicMethod("get", MethodAttributes.Static | MethodAttributes.Public, CallingConventions.Standard, typeof(T[]), new Type[] { typeof(List<T>) }, typeof(ArrayAccessor<T>), true);
+				var il = dm.GetILGenerator();
+				il.Emit(OpCodes.Ldarg_0); // Load List<T> argument
+				il.Emit(OpCodes.Ldfld, typeof(List<T>).GetField("_items", BindingFlags.NonPublic | BindingFlags.Instance)); // Replace argument by field
+				il.Emit(OpCodes.Ret); // Return field
+				Getter = (Func<List<T>, T[]>)dm.CreateDelegate(typeof(Func<List<T>, T[]>));
+			}
+		}
+
+		public static T[] GetInternalArray<T>(this List<T> list)
+		{
+			return ArrayAccessor<T>.Getter(list);
+		}
     }
 }

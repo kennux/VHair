@@ -5,8 +5,9 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Reflection;
+using UnityTK.DataBinding;
 
-namespace UnityTK.DataBinding.Editor.Test
+namespace UnityTK.Test.DataBinding
 {
     public class DataBindingTestExample : MonoBehaviour
     {

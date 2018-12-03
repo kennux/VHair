@@ -32,6 +32,14 @@ namespace UnityTK
         public event Action onClear;
 
         /// <summary>
+        /// Read-only view on the internal list.
+        /// </summary>
+        public ReadOnlyList<T> roList
+        {
+            get { return new ReadOnlyList<T>(this.list); }
+        }
+
+        /// <summary>
         /// The internal list object.
         /// </summary>
         private List<T> list;

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityTK.Audio;
 
-namespace UnityTK.Audio.Editor.Test
+namespace UnityTK.Test.Audio
 {
     public class UTKAudioMock : IUTKAudioSource
     {
