@@ -8,7 +8,7 @@ namespace VHair
     /// <summary>
     /// Utility methods for interacting with the VHair hair system.
     /// </summary>
-    public static class HairUtils
+    public static class HairUtility
     {
     }
 }

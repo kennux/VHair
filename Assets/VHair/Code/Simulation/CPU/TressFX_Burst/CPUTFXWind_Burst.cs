@@ -37,10 +37,9 @@ namespace VHair
 
         protected override void _SimulationStep(float timestep)
         {
-            Vector3 f = this.windZone.transform.forward * Mathf.Abs(Mathf.Sin(Time.time) * this.windZone.windMain) * timestep;
 			Job job = new Job()
 			{
-				force = f,
+				force = WindUtility.EvaluateWindForce(this.windZone, this.transform.position) * timestep,
 				movability = this.simulation.movability,
 				vertices = this.simulation.vertices
 			};
