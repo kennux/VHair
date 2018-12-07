@@ -3,7 +3,8 @@
     "references": [
         "UnityTK",
         "Unity.Burst",
-        "Unity.Mathematics"
+        "Unity.Mathematics",
+        "Unity.Collections"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [],
