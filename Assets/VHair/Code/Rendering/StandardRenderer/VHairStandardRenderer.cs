@@ -99,17 +99,28 @@ namespace VHair
 		public Transform facing;
 		public float hairWidth = .1f;
 		public UVDistributionStrategy uvDistStrat;
+
+		// Follow hair
+		public float followStrandRadius = .01f;
+		public int followStrandsPerRealStrands = 8;
 		
 		private new MeshRenderer renderer;
 		private MeshFilter filter;
 		private Mesh mesh;
+
+		private struct FollowHairStrand
+		{
+			public int hairStrandIndex;
+			public Vector2 offset;
+		}
 		
-		private NativeArray<float3> strandVertices;
-		private NativeArray<float3> vertices;
+		private NativeArray<float3> splineVertices;
+		private NativeArray<float3> triVertices;
 		private NativeArray<float3> uvs;
 		private NativeArray<float3> normals;
 		private NativeArray<int> indices;
 		private NativeArray<TriangulatedSegment> segments;
+		private NativeArray<FollowHairStrand> followHairs;
 
 		public void Awake()
 		{
@@ -123,6 +134,10 @@ namespace VHair
 
 		public void Start()
 		{
+			List<FollowHairStrand> followHairs = new List<FollowHairStrand>();
+
+
+
 			List<TriangulatedSegment> segments = new List<TriangulatedSegment>();
 
 			// Triangulate
@@ -158,7 +173,7 @@ namespace VHair
 			// Distribute uv and indices
 			this.uvs = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
 			this.normals = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
-			this.vertices = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
+			this.triVertices = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
 			this.indices = new NativeArray<int>(segments.Count * 6, Allocator.Persistent);
 			
 			for (int i = 0; i < segments.Count; i++)
@@ -201,8 +216,8 @@ namespace VHair
 			this.uvs.CopyFrom(uvs.ToArray());
 			this.indices.CopyFrom(indices.ToArray());
 
-			this.strandVertices = new NativeArray<float3>(this.instance.asset.vertexCount, Allocator.Temp);
-			NoAllocHelpers.SetMesh(this.mesh, this.vertices, this.uvs, this.normals, this.indices);
+			this.splineVertices = new NativeArray<float3>(this.instance.asset.vertexCount, Allocator.Persistent);
+			NoAllocHelpers.SetMesh(this.mesh, this.triVertices, this.uvs, this.normals, this.indices);
 		}
 
 		private JobHandle handle;
@@ -211,15 +226,15 @@ namespace VHair
 			var vertices = this.instance.vertices.cpuReference;
 			fixed (Vector3* pVertices = vertices)
 			{
-				UnsafeUtility.MemCpy(this.strandVertices.GetUnsafePtr(), (void*)pVertices, UnsafeUtility.SizeOf<Vector3>() * vertices.Length);
+				UnsafeUtility.MemCpy(this.splineVertices.GetUnsafePtr(), (void*)pVertices, UnsafeUtility.SizeOf<Vector3>() * vertices.Length);
 			}
 
 			handle = new PositionUpdateJob()
 			{
 				normals = this.normals,
 				segments = this.segments,
-				hairVertices = this.strandVertices,
-				vertices = this.vertices,
+				hairVertices = this.splineVertices,
+				vertices = this.triVertices,
 				facing = this.facing.position,
 				hairWidth = this.hairWidth,
 				worldToLocal = this.transform.worldToLocalMatrix
@@ -227,17 +242,17 @@ namespace VHair
 
 			JobHandle.ScheduleBatchedJobs();
 			handle.Complete();
-			NoAllocHelpers.SetMesh(this.mesh, this.vertices, null, this.normals);
+			NoAllocHelpers.SetMesh(this.mesh, this.triVertices, null, this.normals);
 			this.mesh.UploadMeshData(false);
 		}
 
 		public void OnDestroy()
 		{
-			this.vertices.Dispose();
+			this.triVertices.Dispose();
 			this.uvs.Dispose();
 			this.normals.Dispose();
 			this.indices.Dispose();
-			this.strandVertices.Dispose();
+			this.splineVertices.Dispose();
 			this.segments.Dispose();
 		}
 	}
