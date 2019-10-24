@@ -10,6 +10,7 @@ namespace VHair.Editor
     public class HairAssetEditor : UnityEditor.Editor
     {
         private IHairAssetImporter currentImporter;
+		private IHairAssetProcessor currentProcessor;
 
         public override void OnInspectorGUI()
         {
@@ -56,27 +57,27 @@ namespace VHair.Editor
                 EditorGUILayout.LabelField("Strand count: " + target.strandCount);
                 EditorGUILayout.LabelField("Vertex count: " + target.vertexCount);
 
-                // TODO: Implement post processing modules
-                if (GUILayout.Button("Set standard Movability"))
-                {
-                    uint[] movability = HairMovability.CreateData(target.vertexCount);
-                    HairStrand[] strands = target.GetStrandData();
+				// Render processor
+				var processors = HairAssetProcessors.GetProcessors();
+				int currentSelectedProcessor = processors.IndexOf(currentProcessor);
+				
+				int newSelectedProcessor = EditorGUILayout.Popup(new GUIContent("Processor: ", "The processor to run on this asset"), currentSelectedProcessor == -1 ? 0 : currentSelectedProcessor, processors.Select((p) => new GUIContent(p.Name, p.Description)).ToArray());
 
-                    for (int i = 0; i < strands.Length; i++)
-                    {
-                        HairStrand strand = strands[i];
-                        HairMovability.SetMovable(strand.firstVertex, false, movability);
-                        int cnt = (strand.lastVertex - strand.firstVertex)+1;
-                        for (int j = 1; j < cnt; j++)
-                        {
-                            HairMovability.SetMovable(strand.firstVertex + j, true, movability);
-                        }
-                    }
+				if (currentSelectedProcessor != newSelectedProcessor)
+				{
+					currentProcessor = processors[newSelectedProcessor];
+				}
 
-                    target.InitializeMovability(movability);
-                    // Mark dirty
-                    EditorUtility.SetDirty(target);
-                }
+				if (currentProcessor != null)
+				{
+					currentProcessor.OnGUI();
+
+					if (GUILayout.Button("Run"))
+					{
+						currentProcessor.Run(target);
+						EditorUtility.SetDirty(target);
+					}
+				}
             }
         }
     }
