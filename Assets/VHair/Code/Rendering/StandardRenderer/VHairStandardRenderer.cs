@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Burst;
+using System.Threading;
 
 namespace VHair
 {
@@ -42,7 +43,7 @@ namespace VHair
 		}
 
 		[BurstCompile]
-		struct PositionUpdateJob : IJobParallelFor
+		unsafe struct PositionUpdateJob : IJobParallelFor
 		{
 			public float3 facing;
 			public float4x4 worldToLocal;
@@ -93,6 +94,7 @@ namespace VHair
 				normals[segment.v2] = n2;
 				normals[segment.v3] = n3;
 				normals[segment.v4] = n4;
+
 			}
 		}
 
@@ -134,7 +136,7 @@ namespace VHair
 
 		public void Start()
 		{
-			List<FollowHairStrand> followHairs = new List<FollowHairStrand>();
+			// List<FollowHairStrand> followHairs = new List<FollowHairStrand>();
 
 
 
@@ -218,11 +220,16 @@ namespace VHair
 
 			this.splineVertices = new NativeArray<float3>(this.instance.asset.vertexCount, Allocator.Persistent);
 			NoAllocHelpers.SetMesh(this.mesh, this.triVertices, this.uvs, this.normals, this.indices);
+
+			LateUpdate();
+			this.mesh.RecalculateBounds();
+			this.mesh.bounds = new Bounds(this.mesh.bounds.center, this.mesh.bounds.size * 3f); // Approximation, real bounding box calculation is difficult to do fast.
 		}
 
 		private JobHandle handle;
 		public unsafe void LateUpdate()
 		{
+			// TODO: Update this to not do memory copies, use NativeArray instead
 			var vertices = this.instance.vertices.cpuReference;
 			fixed (Vector3* pVertices = vertices)
 			{

@@ -35,6 +35,7 @@ namespace VHair
         private bool gpuDirty;
         private bool cpuDirty;
 
+		// TODO: Make this a NativeArray
         public T[] cpuReference
         {
             get
