@@ -110,6 +110,8 @@ namespace VHair
 		private MeshFilter filter;
 		private Mesh mesh;
 
+		public Mesh Mesh => mesh;
+
 		private struct FollowHairStrand
 		{
 			public int hairStrandIndex;
