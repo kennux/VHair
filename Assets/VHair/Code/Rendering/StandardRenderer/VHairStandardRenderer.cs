@@ -100,6 +100,7 @@ namespace VHair
 
 		public Transform facing;
 		public float hairWidth = .1f;
+		public AnimationCurve hairWidthMultiplicatorCurve = AnimationCurve.Linear(0, 1, 1, 1);
 		public UVDistributionStrategy uvDistStrat;
 		
 		private new MeshRenderer renderer;
@@ -107,7 +108,9 @@ namespace VHair
 		private Mesh mesh;
 
 		public Mesh Mesh => mesh;
-		
+		public float CurrentHairWidth => hairWidth * hairWidthMultiplicatorCurve.Evaluate(Vector3.Distance(transform.TransformPoint(mesh.bounds.center), facing.position));
+
+
 		private NativeArray<float3> splineVertices;
 		private NativeArray<float3> triVertices;
 		private NativeArray<float2> uvs;
@@ -230,7 +233,7 @@ namespace VHair
 				hairVertices = this.splineVertices,
 				vertices = this.triVertices,
 				facing = this.facing.position,
-				hairWidth = this.hairWidth,
+				hairWidth = CurrentHairWidth,
 				worldToLocal = this.transform.worldToLocalMatrix
 			}.Schedule(this.segments.Length, 16);
 
