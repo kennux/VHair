@@ -92,12 +92,12 @@ namespace VHair
 				this.referenceVectors[i] = Vector3.zero;
 			}
 
-            HairStrand[] strands = this.instance.asset.GetStrandData();
-            Vector3[] vertices = this.instance.asset.GetVertexData();
+            HairStrand[] strands = this.instance.asset.CreateStrandDataCopy();
+            float3[] vertices = this.instance.asset.CreateVertexDataCopy();
             this.CalculateTransforms(strands, vertices, this.localTransform, this.globalTransform, this.referenceVectors);
         }
 
-        private void CalculateTransforms(HairStrand[] strands, Vector3[] vertices, NativeArray<quaternion> localTransforms, NativeArray<quaternion> globalTransforms, NativeArray<float3> referenceVectors)
+        private void CalculateTransforms(HairStrand[] strands, float3[] vertices, NativeArray<quaternion> localTransforms, NativeArray<quaternion> globalTransforms, NativeArray<float3> referenceVectors)
         {
             for (int i = 0; i < strands.Length; i++)
             {
@@ -106,7 +106,7 @@ namespace VHair
 
 				// First vertex
 				Quaternion local;
-				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation((vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]).normalized);
+				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation(math.normalize(vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]));
 
                 for (j = strand.firstVertex+1; j < strand.lastVertex; j++)
                 {

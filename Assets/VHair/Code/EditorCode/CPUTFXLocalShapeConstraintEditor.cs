@@ -16,7 +16,7 @@ namespace VHair.Editor
 			if (example.debugGlobalTransform)
 			{
 				EditorGUI.BeginChangeCheck();
-				var verts = example.instance.vertices.cpuReference;
+				var verts = example.instance.vertices.CpuReference;
 				var globalTransforms = example.globalTransform;
 				for (int i = 0; i < verts.Length; i++)
 				{
@@ -30,7 +30,7 @@ namespace VHair.Editor
 			if (example.debugRealtime)
 			{
 				EditorGUI.BeginChangeCheck();
-				var verts = example.instance.vertices.cpuReference;
+				var verts = example.instance.vertices.CpuReference;
 				var globalTransforms = example.realtimeDebug;
 				for (int i = 0; i < verts.Length; i++)
 				{
@@ -44,7 +44,7 @@ namespace VHair.Editor
 			if (example.debugLocalTransform)
 			{
 				EditorGUI.BeginChangeCheck();
-				var verts = example.instance.vertices.cpuReference;
+				var verts = example.instance.vertices.CpuReference;
 				var globalTransforms = example.globalTransform;
 				var localTransforms = example.localTransform;
 				for (int i = 0; i < verts.Length; i++)

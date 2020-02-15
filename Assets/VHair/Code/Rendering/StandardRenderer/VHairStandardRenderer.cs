@@ -101,30 +101,19 @@ namespace VHair
 		public Transform facing;
 		public float hairWidth = .1f;
 		public UVDistributionStrategy uvDistStrat;
-
-		// Follow hair
-		public float followStrandRadius = .01f;
-		public int followStrandsPerRealStrands = 8;
 		
 		private new MeshRenderer renderer;
 		private MeshFilter filter;
 		private Mesh mesh;
 
 		public Mesh Mesh => mesh;
-
-		private struct FollowHairStrand
-		{
-			public int hairStrandIndex;
-			public Vector2 offset;
-		}
 		
 		private NativeArray<float3> splineVertices;
 		private NativeArray<float3> triVertices;
-		private NativeArray<float3> uvs;
+		private NativeArray<float2> uvs;
 		private NativeArray<float3> normals;
 		private NativeArray<int> indices;
 		private NativeArray<TriangulatedSegment> segments;
-		private NativeArray<FollowHairStrand> followHairs;
 
 		public void Awake()
 		{
@@ -138,14 +127,10 @@ namespace VHair
 
 		public void Start()
 		{
-			// List<FollowHairStrand> followHairs = new List<FollowHairStrand>();
-
-
-
 			List<TriangulatedSegment> segments = new List<TriangulatedSegment>();
 
 			// Triangulate
-			var strands = this.instance.strands.cpuReference;
+			var strands = this.instance.strands.CpuReference;
 			{
 				int vCtr = 0;
 				for (int sIndex = 0; sIndex < strands.Length; sIndex++)
@@ -175,7 +160,7 @@ namespace VHair
 			this.segments.CopyFrom(segments.ToArray());
 
 			// Distribute uv and indices
-			this.uvs = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
+			this.uvs = new NativeArray<float2>(segments.Count * 4, Allocator.Persistent);
 			this.normals = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
 			this.triVertices = new NativeArray<float3>(segments.Count * 4, Allocator.Persistent);
 			this.indices = new NativeArray<int>(segments.Count * 6, Allocator.Persistent);
@@ -185,8 +170,8 @@ namespace VHair
 				var segment = segments[i];
 
 				// Calc uv
-				float3 uv1, uv2, uv3, uv4;
-				uv1 = uv2 = uv3 = uv4 = float3.zero;
+				float2 uv1, uv2, uv3, uv4;
+				uv1 = uv2 = uv3 = uv4 = float2.zero;
 				switch (this.uvDistStrat)
 				{
 					case UVDistributionStrategy.ALONG_STRAND_Y:
@@ -195,10 +180,10 @@ namespace VHair
 							float y = segment.strandVertexIndex1 / (hs.lastVertex - hs.firstVertex);
 							float y2 = segment.strandVertexIndex2 / (hs.lastVertex - hs.firstVertex);
 							
-							uv1 = new float3(0, y, 0);
-							uv2 = new float3(1, y, 0);
-							uv3 = new float3(0, y2, 0);
-							uv4 = new float3(1, y2, 0);
+							uv1 = new float2(0, y);
+							uv2 = new float2(1, y);
+							uv3 = new float2(0, y2);
+							uv4 = new float2(1, y2);
 						}
 						break;
 				}
@@ -220,8 +205,13 @@ namespace VHair
 			this.uvs.CopyFrom(uvs.ToArray());
 			this.indices.CopyFrom(indices.ToArray());
 
-			this.splineVertices = new NativeArray<float3>(this.instance.asset.vertexCount, Allocator.Persistent);
-			NoAllocHelpers.SetMesh(this.mesh, this.triVertices, this.uvs, this.normals, this.indices);
+			this.splineVertices = new NativeArray<float3>(this.instance.asset.VertexCount, Allocator.Persistent);
+
+			// Init mesh
+			this.mesh.SetVertices<float3>(triVertices);
+			this.mesh.SetUVs<float2>(0, uvs);
+			this.mesh.SetNormals<float3>(normals);
+			this.mesh.SetIndices<int>(indices, MeshTopology.Triangles, 0);
 
 			LateUpdate();
 			this.mesh.RecalculateBounds();
@@ -231,12 +221,7 @@ namespace VHair
 		private JobHandle handle;
 		public unsafe void LateUpdate()
 		{
-			// TODO: Update this to not do memory copies, use NativeArray instead
-			var vertices = this.instance.vertices.cpuReference;
-			fixed (Vector3* pVertices = vertices)
-			{
-				UnsafeUtility.MemCpy(this.splineVertices.GetUnsafePtr(), (void*)pVertices, UnsafeUtility.SizeOf<Vector3>() * vertices.Length);
-			}
+			this.splineVertices.CopyFrom(this.instance.vertices.CpuReference);
 
 			handle = new PositionUpdateJob()
 			{
@@ -251,7 +236,9 @@ namespace VHair
 
 			JobHandle.ScheduleBatchedJobs();
 			handle.Complete();
-			NoAllocHelpers.SetMesh(this.mesh, this.triVertices, null, this.normals);
+
+			mesh.SetVertices<float3>(this.triVertices);
+			mesh.SetNormals<float3>(this.normals);
 			this.mesh.UploadMeshData(false);
 		}
 

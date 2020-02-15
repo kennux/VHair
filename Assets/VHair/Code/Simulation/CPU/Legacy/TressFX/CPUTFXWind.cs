@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair
@@ -16,9 +18,9 @@ namespace VHair
         protected override void _SimulationStep(float timestep)
         {
             // TODO: Spherical wind zones
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
-            Vector3 f = this.windZone.transform.forward * Mathf.Abs(Mathf.Sin(Time.time) * this.windZone.windMain);
+            NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+			NativeArray<uint> movability = this.instance.movability.CpuReference;
+            float3 f = this.windZone.transform.forward * Mathf.Abs(Mathf.Sin(Time.time) * this.windZone.windMain);
 
             for (int i = 0; i < vertices.Length; i++)
             {

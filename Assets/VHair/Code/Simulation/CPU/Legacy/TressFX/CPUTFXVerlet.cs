@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair
@@ -20,9 +22,9 @@ namespace VHair
             Matrix4x4 invPrevMatrix = this.simulation.prevFrameMatrix.inverse;
 
             // Read vertices and strands
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
+            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+			NativeArray<uint> movability = this.instance.movability.CpuReference;
 
             Vector3 gravity = Physics.gravity * this.gravityStrength;
             HairStrand strand;

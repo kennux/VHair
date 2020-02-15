@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Collections;
+using Unity.Mathematics;
 
 namespace VHair
 {
@@ -17,8 +19,8 @@ namespace VHair
         public override void InitializeSimulation()
         {
             this.lengths = new float[this.instance.vertexCount];
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
+			NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
 
             for (int s = 0; s < strands.Length; s++)
             {
@@ -32,9 +34,9 @@ namespace VHair
 
         protected override void _SimulationStep(float timestep)
         {
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
+            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+            NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+            NativeArray<uint> movability = this.instance.movability.CpuReference;
             
             for (int s = 0; s < strands.Length; s++)
             {

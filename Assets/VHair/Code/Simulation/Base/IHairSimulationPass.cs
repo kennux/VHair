@@ -15,7 +15,7 @@ namespace VHair
         /// <summary>
         /// Whether or not this pass is currently enabled and should be executed when updating the simulation.
         /// </summary>
-        bool enabled { get; }
+        bool Enabled { get; }
         
         /// <summary>
         /// Called when the simulation is being initialized from <see cref="HairSimulation"/>.

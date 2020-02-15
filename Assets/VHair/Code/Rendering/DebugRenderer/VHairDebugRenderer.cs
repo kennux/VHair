@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace VHair
 {
@@ -23,14 +24,14 @@ namespace VHair
         [SerializeField]
         private Material material;
         
-        private Vector3[] _vertices;
+        private NativeArray<float3> _vertices;
         private HairStrand[] _strands;
         private List<int> _indices = new List<int>();
 
         public void Start()
         {
-            this._vertices = new Vector3[this.instance.asset.vertexCount];
-            this._strands = new HairStrand[this.instance.asset.strandCount];
+            this._vertices = new NativeArray<float3>(this.instance.asset.VertexCount, Allocator.Persistent);
+            this._strands = new HairStrand[this.instance.asset.StrandCount];
             this.mesh = new Mesh();
             this.mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             mesh.MarkDynamic();
@@ -41,7 +42,7 @@ namespace VHair
         private void UpdateMeshInitial()
         {
             this._indices.Clear();
-            this.instance.strands.cpuReference.CopyTo(this._strands, 0);
+            this.instance.strands.CpuReference.CopyTo(this._strands);
 
             int sLen = _strands.Length;
             for (int i = 0; i < sLen; i++)
@@ -61,10 +62,10 @@ namespace VHair
         private void UpdateMesh()
         {
             // Get data copy
-            this.instance.vertices.cpuReference.CopyTo(this._vertices, 0);
+            this.instance.vertices.CpuReference.CopyTo(this._vertices);
 
             // Set mesh data
-            mesh.vertices = this._vertices;
+            mesh.SetVertices<float3>(_vertices);
             mesh.RecalculateBounds();
             mesh.UploadMeshData(false);
         }
@@ -74,5 +75,11 @@ namespace VHair
             this.UpdateMesh();
             Graphics.DrawMesh(this.mesh, Matrix4x4.identity, this.material, this.gameObject.layer);
         }
-    }
+
+		protected void OnDestroy()
+		{
+			if (this._vertices.IsCreated)
+				this._vertices.Dispose();
+		}
+	}
 }

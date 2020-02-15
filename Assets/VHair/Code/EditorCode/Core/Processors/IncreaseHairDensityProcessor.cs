@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using Unity.Mathematics;
 
 namespace VHair.Editor
 {
@@ -25,8 +26,8 @@ namespace VHair.Editor
 
 		public void Run(HairAsset asset)
 		{
-			asset.GetRawDataCopy(out Vector3[] originalVertices, out HairStrand[] originalStrands, out uint[] originalMovability);
-			List<Vector3> newVertices = new List<Vector3>();
+			asset.GetRawDataCopy(out float3[] originalVertices, out HairStrand[] originalStrands, out uint[] originalMovability);
+			List<float3> newVertices = new List<float3>();
 			List<HairStrand> newStrands = new List<HairStrand>();
 			BitArray movability = new BitArray(originalVertices.Length * (newHairPerHair + 1));
 			for (int i = 0; i < originalMovability.Length; i++)
@@ -49,7 +50,7 @@ namespace VHair.Editor
 						Quaternion orientation = k == origStrand.lastVertex ? Quaternion.LookRotation(originalVertices[k] - originalVertices[k-1]) : Quaternion.LookRotation(originalVertices[k+1] - originalVertices[k]);
 						Vector3 left = orientation * Vector3.left;
 						Vector3 up = orientation * Vector3.up;
-						Vector3 offset = (rLeft * left) + (rUp * up);
+						float3 offset = (rLeft * left) + (rUp * up);
 						movability[originalVertices.Length + newVertices.Count] = movability[k];
 						newVertices.Add(originalVertices[k] + offset);
 					}

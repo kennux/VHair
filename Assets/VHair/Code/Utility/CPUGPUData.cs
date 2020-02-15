@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
+using Unity.Collections;
 
 namespace VHair
 {
@@ -17,15 +18,10 @@ namespace VHair
     /// </summary>
     public class CPUGPUData<T> : IDisposable where T : struct
     {
-        public int count
-        {
-            get { return this.cpuData.Length; }
-        }
-
         /// <summary>
         /// Cpu side of the data
         /// </summary>
-        private T[] cpuData;
+        private NativeArray<T> cpuData;
 
         /// <summary>
         /// Gpu side of the data
@@ -35,8 +31,14 @@ namespace VHair
         private bool gpuDirty;
         private bool cpuDirty;
 
-		// TODO: Make this a NativeArray
-        public T[] cpuReference
+		private T[] tmpGpuSync; // TODO: Get rid of this once unity api is not retarded anymore and has ComputeBuffer.GetData() for NativeArray<T> (They have SetData(NativeArray<T>) already >_>).
+
+		public int Count
+		{
+			get { return this.cpuData.Length; }
+		}
+
+		public NativeArray<T> CpuReference
         {
             get
             {
@@ -46,7 +48,7 @@ namespace VHair
             }
         }
 
-        public ComputeBuffer gpuReference
+        public ComputeBuffer GpuReference
         {
             get
             {
@@ -54,19 +56,26 @@ namespace VHair
                     UpdateGPUData();
                 return this.gpuData;
             }
-        }
+		}
 
-        public CPUGPUData(T[] data, int dataStride)
-        {
-            this.gpuData = new ComputeBuffer(data.Length, dataStride);
-            this.cpuData = data;
-            this.UpdateGPUData();
-        }
+		public CPUGPUData(T[] data, int dataStride)
+		{
+			this.gpuData = new ComputeBuffer(data.Length, dataStride);
+			this.cpuData = new NativeArray<T>(data, Allocator.Persistent);
+			this.UpdateGPUData();
+		}
 
-        /// <summary>
-        /// Copies the data from cpu to gpu
-        /// </summary>
-        private void UpdateGPUData()
+		public CPUGPUData(NativeArray<T> data, int dataStride)
+		{
+			this.gpuData = new ComputeBuffer(data.Length, dataStride);
+			this.cpuData = data;
+			this.UpdateGPUData();
+		}
+
+		/// <summary>
+		/// Copies the data from cpu to gpu
+		/// </summary>
+		private void UpdateGPUData()
         {
             this.gpuData.SetData(this.cpuData);
             this.gpuDirty = false;
@@ -77,7 +86,11 @@ namespace VHair
         /// </summary>
         private void UpdateCPUData()
         {
-            this.gpuData.GetData(this.cpuData);
+			if (tmpGpuSync == null || tmpGpuSync.Length != this.gpuData.count)
+				tmpGpuSync = new T[this.gpuData.count];
+
+			this.gpuData.GetData(tmpGpuSync);
+			cpuData.CopyFrom(tmpGpuSync);
             this.cpuDirty = false;
         }
 
@@ -102,6 +115,7 @@ namespace VHair
         public void Dispose()
         {
             this.gpuData.Dispose();
+			this.cpuData.Dispose();
         }
     }
 }

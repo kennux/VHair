@@ -19,7 +19,7 @@ namespace VHair
 
         protected override void _SimulationStep(float timestep)
         {
-            var vertexArray = this.instance.vertices.cpuReference;
+            var vertexArray = this.instance.vertices.CpuReference;
             Matrix4x4 matrix = Matrix4x4.TRS(this.transform.position, this.transform.rotation, this.transform.lossyScale);
             var vertices = this.simulation.vertices;
             for (int i = 0; i < vertexArray.Length; i++)

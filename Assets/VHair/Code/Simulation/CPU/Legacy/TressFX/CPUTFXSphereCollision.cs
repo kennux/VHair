@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityTK;
 
@@ -36,8 +38,8 @@ namespace VHair
             }
             int colliderCount = colliders.Count;
 
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
+            NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+            NativeArray<uint> movability = this.instance.movability.CpuReference;
 
             bool wasAnythingModified = false;
             for (int i = 0; i < vertices.Length; i++)

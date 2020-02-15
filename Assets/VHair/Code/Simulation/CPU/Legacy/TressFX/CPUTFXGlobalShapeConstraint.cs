@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair
@@ -15,9 +17,9 @@ namespace VHair
 
         protected override void _SimulationStep(float timestep)
         {
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
-            HairStrand[] strands = this.instance.strands.cpuReference;
+            NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+			NativeArray<uint> movability = this.instance.movability.CpuReference;
+			NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
 
             Matrix4x4 matrix = this.transform.localToWorldMatrix;
             for (int j = 0; j < strands.Length; j++)

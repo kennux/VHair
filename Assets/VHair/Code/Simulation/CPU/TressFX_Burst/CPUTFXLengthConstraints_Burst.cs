@@ -54,15 +54,15 @@ namespace VHair
         public override void InitializeSimulation()
         {
             this.lengths = new NativeArray<float>(this.instance.vertexCount, Allocator.Persistent);
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
+            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
 
             for (int s = 0; s < strands.Length; s++)
             {
                 HairStrand strand = strands[s];
                 for (int j = strand.firstVertex+1; j < strand.lastVertex; j++)
                 {
-                    this.lengths[j] = Vector3.Distance(vertices[j], vertices[j - 1]);
+                    this.lengths[j] = math.distance(vertices[j], vertices[j - 1]);
                 }
             }
         }

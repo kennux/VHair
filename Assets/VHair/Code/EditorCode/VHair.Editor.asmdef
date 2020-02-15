@@ -3,12 +3,18 @@
     "references": [
         "UnityTK.Editor",
         "UnityTK",
-        "VHair"
+        "VHair",
+        "Unity.Mathematics"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
-    "allowUnsafeCode": false
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -23,6 +23,8 @@ namespace VHair
 
         protected T simulation;
 
+		public bool Enabled => enabled;
+
         /// <summary>
         /// Reads <see cref="simulation"/>
         /// </summary>

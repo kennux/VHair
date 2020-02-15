@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair
@@ -11,10 +13,10 @@ namespace VHair
     {
         // Simulation properties
         [HideInInspector]
-        public Vector3[] prevFrameVertices;
+        public NativeArray<float3> prevFrameVertices;
 
         [HideInInspector]
-        public Vector3[] initialVertices;
+        public NativeArray<float3> initialVertices;
 
         [HideInInspector]
         public Matrix4x4 prevFrameMatrix;
@@ -25,12 +27,12 @@ namespace VHair
         {
             base.Start();
 
-            this.prevFrameVertices = this.instance.asset.GetVertexData();
-            this.initialVertices = this.instance.asset.GetVertexData();
+            this.prevFrameVertices = this.instance.asset.CreateVertexDataCopy(Allocator.Persistent);
+            this.initialVertices = this.instance.asset.CreateVertexDataCopy(Allocator.Persistent);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
 
             // Initial vertex transform
-            var vertices = this.instance.vertices.cpuReference;
+            var vertices = this.instance.vertices.CpuReference;
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = this.prevFrameMatrix.MultiplyPoint3x4(vertices[i]);
@@ -41,8 +43,16 @@ namespace VHair
         {
             base._Update(timestep * this.timestepScale);
 
-            System.Array.Copy(this.instance.vertices.cpuReference, this.prevFrameVertices, this.instance.asset.vertexCount);
+			this.instance.vertices.CpuReference.CopyTo(this.prevFrameVertices);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
         }
+
+		protected void OnDestroy()
+		{
+			if (prevFrameVertices.IsCreated)
+				prevFrameVertices.Dispose();
+			if (initialVertices.IsCreated)
+				initialVertices.Dispose();
+		}
     }
 }

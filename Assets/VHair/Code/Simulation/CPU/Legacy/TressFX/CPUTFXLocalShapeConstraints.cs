@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Collections;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair
@@ -45,12 +47,12 @@ namespace VHair
 				this.referenceVectors[i] = Vector3.zero;
 			}
 
-            HairStrand[] strands = this.instance.asset.GetStrandData();
-            Vector3[] vertices = this.instance.asset.GetVertexData();
+            HairStrand[] strands = this.instance.asset.CreateStrandDataCopy();
+			float3[] vertices = this.instance.asset.CreateVertexDataCopy();
             this.CalculateTransforms(strands, vertices, this.localTransform, this.globalTransform, this.referenceVectors);
         }
 
-        private void CalculateTransforms(HairStrand[] strands, Vector3[] vertices, Quaternion[] localTransforms, Quaternion[] globalTransforms, Vector3[] referenceVectors)
+        private void CalculateTransforms(HairStrand[] strands, float3[] vertices, Quaternion[] localTransforms, Quaternion[] globalTransforms, Vector3[] referenceVectors)
         {
             for (int i = 0; i < strands.Length; i++)
             {
@@ -59,7 +61,7 @@ namespace VHair
 
 				// First vertex
 				Quaternion local;
-				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation((vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]).normalized);
+				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation(math.normalize(vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]));
 
                 for (j = strand.firstVertex+1; j < strand.lastVertex; j++)
                 {
@@ -80,9 +82,9 @@ namespace VHair
         protected override void _SimulationStep(float timestep)
         {
 			float stiffness = .5f * Mathf.Min(this.stiffness * timestep, .95f);
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-			uint[] movability = this.instance.movability.cpuReference;
+            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+			NativeArray<uint> movability = this.instance.movability.CpuReference;
 			Quaternion rotation = this.transform.rotation;
 			
 			// Apply local shape constraint

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using Unity.Mathematics;
 
 namespace VHair.Editor
 {
@@ -33,8 +34,8 @@ namespace VHair.Editor
 
                 if (GUILayout.Button("Import"))
                 {
-                    // Temporary variables
-                    Vector3[] vertices;
+					// Temporary variables
+					float3[] vertices;
                     HairStrand[] strands;
 
                     // Import
@@ -54,8 +55,8 @@ namespace VHair.Editor
             // Render actual inspector
             if (target.wasImported)
             {
-                EditorGUILayout.LabelField("Strand count: " + target.strandCount);
-                EditorGUILayout.LabelField("Vertex count: " + target.vertexCount);
+                EditorGUILayout.LabelField("Strand count: " + target.StrandCount);
+                EditorGUILayout.LabelField("Vertex count: " + target.VertexCount);
 
 				// Render processor
 				var processors = HairAssetProcessors.GetProcessors();

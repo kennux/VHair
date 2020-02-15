@@ -16,11 +16,9 @@ namespace VHair
         // Simulation properties
         [HideInInspector]
         public NativeArray<float3> prevFrameVertices;
-		private Vector3[] _prevFrameVertices;
 
         [HideInInspector]
         public NativeArray<float3> initialVertices;
-		private Vector3[] _initialVertices;
 
         [HideInInspector]
         public Matrix4x4 prevFrameMatrix;
@@ -31,44 +29,21 @@ namespace VHair
 
 		public float timestepScale = 1;
 
-		public static unsafe void CopyVectorArray(Vector3[] from, NativeArray<float3> to)
-		{
-			fixed (Vector3* fromPtr = from)
-			{
-				UnsafeUtility.MemCpy(NativeArrayUnsafeUtility.GetUnsafePtr(to), (void*)fromPtr, sizeof(Vector3) * from.Length);
-			}
-		}
-
-		public static unsafe void CopyVectorArray(NativeArray<float3> from, Vector3[] to)
-		{
-			fixed (Vector3* toPtr = to)
-			{
-				UnsafeUtility.MemCpy((void*)toPtr, NativeArrayUnsafeUtility.GetUnsafePtr(from), sizeof(Vector3) * from.Length);
-			}
-		}
-
         protected override void Start()
         {
             base.Start();
 			
-			this._prevFrameVertices = this.instance.asset.GetVertexData();
-			this._initialVertices = this.instance.asset.GetVertexData();
-            this.prevFrameVertices = new NativeArray<float3>(this._prevFrameVertices.Length, Allocator.Persistent);
-            this.initialVertices = new NativeArray<float3>(this._initialVertices.Length, Allocator.Persistent);
+			this.prevFrameVertices = this.instance.asset.CreateVertexDataCopy(Allocator.Persistent);
+			this.initialVertices = this.instance.asset.CreateVertexDataCopy(Allocator.Persistent);
 
 			// Copy asset data
-            this.vertices = new NativeArray<float3>(this._initialVertices.Length, Allocator.Persistent);
-            this.strands = new NativeArray<HairStrand>(this.instance.asset.GetStrandData(), Allocator.Persistent);
-            this.movability = new NativeArray<uint>(this.instance.asset.GetMovabilityData(), Allocator.Persistent);
+            this.vertices = this.instance.asset.CreateVertexDataCopy(Allocator.Persistent);
+            this.strands = this.instance.asset.CreateStrandDataCopy(Allocator.Persistent);
+            this.movability = this.instance.asset.CreateMovabilityDataCopy(Allocator.Persistent);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;
 
-			// Setup native arrays
-			CopyVectorArray(this._prevFrameVertices, this.prevFrameVertices);
-			CopyVectorArray(this._initialVertices, this.initialVertices);
-			CopyVectorArray(this._initialVertices, this.vertices);
-
             // Initial vertex transform
-            var vertices = this.instance.vertices.cpuReference;
+            var vertices = this.instance.vertices.CpuReference;
             for (int i = 0; i < vertices.Length; i++)
             {
                 vertices[i] = this.prevFrameMatrix.MultiplyPoint3x4(vertices[i]);
@@ -84,7 +59,7 @@ namespace VHair
 
 			JobHandle.ScheduleBatchedJobs();
 			this.jobHandle.Complete();
-			CopyVectorArray(this.vertices, this.instance.vertices.cpuReference);
+			this.vertices.CopyTo(this.instance.vertices.CpuReference);
 			this.instance.vertices.SetGPUDirty();
 			this.vertices.CopyTo(this.prevFrameVertices);
             this.prevFrameMatrix = this.transform.localToWorldMatrix;

@@ -18,8 +18,8 @@ namespace VHair.Editor
 
 		public void Run(HairAsset asset)
 		{
-			uint[] movability = HairMovability.CreateData(asset.vertexCount);
-			HairStrand[] strands = asset.GetStrandData();
+			uint[] movability = HairMovability.CreateData(asset.VertexCount);
+			HairStrand[] strands = asset.CreateStrandDataCopy();
 
 			for (int i = 0; i < strands.Length; i++)
 			{

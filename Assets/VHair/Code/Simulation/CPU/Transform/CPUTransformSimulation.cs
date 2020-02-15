@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using System.Threading.Tasks;
+using Unity.Mathematics;
 
 namespace VHair
 {
@@ -12,15 +13,15 @@ namespace VHair
     /// </summary>
     public class CPUTransformSimulation : HairSimulation
     {
-        public Vector3[] vertices
+        public float3[] vertices
         {
             get { return this._vertices; }
         }
-        private Vector3[] _vertices;
+        private float3[] _vertices;
 
         protected void Awake()
         {
-            this._vertices = this.instance.asset.GetVertexData();
+            this._vertices = this.instance.asset.CreateVertexDataCopy();
         }
     }
 }

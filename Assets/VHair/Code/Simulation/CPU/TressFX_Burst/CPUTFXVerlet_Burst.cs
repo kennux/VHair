@@ -76,10 +76,10 @@ namespace VHair
             Matrix4x4 invPrevMatrix = this.simulation.prevFrameMatrix.inverse;
 
             // Read vertices and strands
-            HairStrand[] strands = this.instance.strands.cpuReference;
-            Vector3[] vertices = this.instance.vertices.cpuReference;
-            uint[] movability = this.instance.movability.cpuReference;
-            Vector3 gravity = Physics.gravity * this.gravityStrength;
+            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
+			NativeArray<uint> movability = this.instance.movability.CpuReference;
+            float3 gravity = Physics.gravity * this.gravityStrength;
 			
             float timestepSqr = timestep * timestep;
 

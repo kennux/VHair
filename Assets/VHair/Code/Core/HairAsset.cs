@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
+using Unity.Mathematics;
 
 namespace VHair
 {
@@ -15,7 +16,7 @@ namespace VHair
         /// The vertices used for the hair.
         /// </summary>
         [SerializeField]
-        private Vector3[] vertices;
+        private float3[] vertices;
 
         /// <summary>
         /// The strands of this hair asset.
@@ -25,7 +26,7 @@ namespace VHair
 
         /// <summary>
         /// The movability bits of the hair.
-        /// Bit index maps to <see cref="vertexCount"/>, <see cref="HairMovability"/> for the utilities to access this data.
+        /// Bit index maps to <see cref="VertexCount"/>, <see cref="HairMovability"/> for the utilities to access this data.
         /// </summary>
         [SerializeField]
         private uint[] movability;
@@ -38,7 +39,7 @@ namespace VHair
         /// <summary>
         /// The amount of strands in this hair asset.
         /// </summary>
-        public int strandCount
+        public int StrandCount
         {
             get { return this.strands.Length; }
         }
@@ -46,62 +47,83 @@ namespace VHair
         /// <summary>
         /// The amount of vertices in this hair asset.
         /// </summary>
-        public int vertexCount
+        public int VertexCount
         {
             get { return this.vertices.Length; }
-        }
+		}
 
-        /// <summary>
-        /// Allocates and returns a copy of <see cref="vertices"/>
-        /// </summary>
-        public Vector3[] GetVertexData()
-        {
-            Vector3[] vertices = new Vector3[this.vertices.Length];
-            System.Array.Copy(this.vertices, vertices, vertices.Length);
-            return vertices;
-        }
+		/// <summary>
+		/// Allocates and returns a copy of <see cref="vertices"/>
+		/// </summary>
+		public float3[] CreateVertexDataCopy()
+		{
+			float3[] vertices = new float3[this.vertices.Length];
+			System.Array.Copy(this.vertices, vertices, vertices.Length);
+			return vertices;
+		}
 
-        /// <summary>
-        /// Allocates and returns a copy of <see cref="strands"/>
-        /// </summary>
-        public HairStrand[] GetStrandData()
-        {
-            HairStrand[] strands = new HairStrand[this.strands.Length];
-            System.Array.Copy(this.strands, strands, strands.Length);
-            return strands;
-        }
+		/// <summary>
+		/// Allocates and returns a copy of <see cref="vertices"/>, as <see cref="Unity.Collections.NativeArray{T}"/>
+		/// </summary>
+		public NativeArray<float3> CreateVertexDataCopy(Allocator allocator)
+		{
+			return new NativeArray<float3>(this.vertices, allocator);
+		}
 
-        /// <summary>
-        /// Creates a copy of <see cref="movability"/>
-        /// </summary>
-        /// <param name="movability"></param>
-        public uint[] GetMovabilityData()
+		/// <summary>
+		/// Allocates and returns a copy of <see cref="strands"/>
+		/// </summary>
+		public HairStrand[] CreateStrandDataCopy()
+		{
+			HairStrand[] strands = new HairStrand[this.strands.Length];
+			System.Array.Copy(this.strands, strands, strands.Length);
+			return strands;
+		}
+
+		/// <summary>
+		/// Allocates and returns a copy of <see cref="strands"/>
+		/// </summary>
+		public NativeArray<HairStrand> CreateStrandDataCopy(Allocator allocator)
+		{
+			return new NativeArray<HairStrand>(this.strands, allocator);
+		}
+
+		/// <summary>
+		/// Creates a copy of <see cref="movability"/>
+		/// </summary>
+		/// <param name="movability"></param>
+		public uint[] CreateMovabilityDataCopy()
         {
             uint[] movability = new uint[Mathf.CeilToInt(this.vertices.Length / 32f)];
             System.Array.Copy(this.movability, movability, movability.Length);
             return movability;
         }
 
+		public NativeArray<uint> CreateMovabilityDataCopy(Allocator allocator)
+		{
+			return new NativeArray<uint>(this.movability, allocator);
+		}
+
         /// <summary>
         /// AiO version of:
-        /// <see cref="GetVertexData"/>
-        /// <see cref="GetStrandData"/>
-        /// <see cref="GetMovabilityData()"/>
+        /// <see cref="CreateVertexDataCopy"/>
+        /// <see cref="CreateStrandDataCopy"/>
+        /// <see cref="CreateMovabilityDataCopy()"/>
         /// </summary>
-        public void GetRawDataCopy(out Vector3[] vertices, out HairStrand[] strands, out uint[] movability)
+        public void GetRawDataCopy(out float3[] vertices, out HairStrand[] strands, out uint[] movability)
         {
-            vertices = GetVertexData();
-            strands = GetStrandData();
-            movability = GetMovabilityData();
+            vertices = CreateVertexDataCopy();
+            strands = CreateStrandDataCopy();
+            movability = CreateMovabilityDataCopy();
         }
 
         /// <summary>
         /// Initializes (reallocates and overwrites internal-) vertex data.
         /// </summary>
         /// <param name="vertices">The vertex data to write to the asset.</param>
-        public void InitializeVertices(Vector3[] vertices)
+        public void InitializeVertices(float3[] vertices)
         {
-            this.vertices = new Vector3[vertices.Length];
+            this.vertices = new float3[vertices.Length];
             vertices.CopyTo(this.vertices, 0);
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace VHair.Editor
@@ -18,6 +19,6 @@ namespace VHair.Editor
         /// <summary>
         /// <see cref="IHairAsset.SetData(Vector3[], HairStrand[])"/>
         /// </summary>
-        void Import(out Vector3[] vertices, out HairStrand[] strands);
+        void Import(out float3[] vertices, out HairStrand[] strands);
     }
 }

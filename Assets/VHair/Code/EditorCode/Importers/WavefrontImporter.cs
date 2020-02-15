@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 using UnityTK;
+using Unity.Mathematics;
 
 namespace VHair.Editor
 {
@@ -25,10 +26,10 @@ namespace VHair.Editor
 
         public string filePath;
 
-        public void Import(out Vector3[] vertices, out HairStrand[] strands)
+        public void Import(out float3[] vertices, out HairStrand[] strands)
         {
             // Prepare temporary lists
-            List<Vector3> _vertices = new List<Vector3>();
+            List<float3> _vertices = new List<float3>();
             List<HairStrand> _strands = new List<HairStrand>();
             HashSet<int> _currentStrandIndices = new HashSet<int>();
 
