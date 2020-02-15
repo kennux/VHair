@@ -8,8 +8,8 @@ using Unity.Burst;
 
 namespace VHair
 {
-    public class CPUTFXWind_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
-    {
+	public class CPUTFXWind_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
+	{
 		[BurstCompile]
 		struct Job : IJobParallelFor
 		{
@@ -21,22 +21,22 @@ namespace VHair
 			public NativeArray<float3> vertices;
 			public void Execute(int i)
 			{
-                if (!HairMovability.IsMovable(i, movability))
-                    return;
+				if (!HairMovability.IsMovable(i, movability))
+					return;
 
-                vertices[i] = vertices[i] + force;
+				vertices[i] = vertices[i] + force;
 			}
 		}
 
 		public WindZone windZone;
 
-        public override void InitializeSimulation()
-        {
+		public override void InitializeSimulation()
+		{
 
-        }
+		}
 
-        protected override void _SimulationStep(float timestep)
-        {
+		protected override void _SimulationStep(float timestep)
+		{
 			Job job = new Job()
 			{
 				force = WindUtility.EvaluateWindForce(this.windZone, this.transform.position) * timestep,
@@ -45,6 +45,6 @@ namespace VHair
 			};
 
 			this.simulation.jobHandle = job.Schedule(this.simulation.vertices.Length, 128, this.simulation.jobHandle);
-        }
-    }
+		}
+	}
 }

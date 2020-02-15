@@ -6,62 +6,62 @@ using UnityEngine;
 
 namespace VHair
 {
-    public class CPUTFXVerlet : HairSimulationPass<CPUTFXPhysicsSimulation>
-    {
-        public float gravityStrength = 1;
+	public class CPUTFXVerlet : HairSimulationPass<CPUTFXPhysicsSimulation>
+	{
+		public float gravityStrength = 1;
 
-        public override void InitializeSimulation()
-        {
+		public override void InitializeSimulation()
+		{
 
-        }
+		}
 
-        protected override void _SimulationStep(float timestep)
-        {
-            // TODO: Damping
-            Matrix4x4 matrix = this.transform.localToWorldMatrix;
-            Matrix4x4 invPrevMatrix = this.simulation.prevFrameMatrix.inverse;
+		protected override void _SimulationStep(float timestep)
+		{
+			// TODO: Damping
+			Matrix4x4 matrix = this.transform.localToWorldMatrix;
+			Matrix4x4 invPrevMatrix = this.simulation.prevFrameMatrix.inverse;
 
-            // Read vertices and strands
-            NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
+			// Read vertices and strands
+			NativeArray<HairStrand> strands = this.instance.strands.CpuReference;
 			NativeArray<float3> vertices = this.instance.vertices.CpuReference;
 			NativeArray<uint> movability = this.instance.movability.CpuReference;
 
-            Vector3 gravity = Physics.gravity * this.gravityStrength;
-            HairStrand strand;
-            Vector3 lastFramePosWS, lastFramePosOS, posWS, newPos;
-            lastFramePosOS = lastFramePosWS = posWS = newPos = new Vector3();
-            float timestepSqr = timestep * timestep;
-            for (int j = 0; j < strands.Length; j++)
-            {
-                strand = strands[j];
+			Vector3 gravity = Physics.gravity * this.gravityStrength;
+			HairStrand strand;
+			Vector3 lastFramePosWS, lastFramePosOS, posWS, newPos;
+			lastFramePosOS = lastFramePosWS = posWS = newPos = new Vector3();
+			float timestepSqr = timestep * timestep;
+			for (int j = 0; j < strands.Length; j++)
+			{
+				strand = strands[j];
 
-                // First vertex is immovable
-                vertices[strand.firstVertex] = matrix.MultiplyPoint3x4(this.simulation.initialVertices[strand.firstVertex]);
+				// First vertex is immovable
+				vertices[strand.firstVertex] = matrix.MultiplyPoint3x4(this.simulation.initialVertices[strand.firstVertex]);
 
-                for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
-                {
-                    if (!HairMovability.IsMovable(i, movability))
-                        continue;
+				for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
+				{
+					if (!HairMovability.IsMovable(i, movability))
+						continue;
 
-                    lastFramePosWS = vertices[i];
-                    lastFramePosOS = invPrevMatrix.MultiplyPoint3x4(lastFramePosWS);
+					lastFramePosWS = vertices[i];
+					lastFramePosOS = invPrevMatrix.MultiplyPoint3x4(lastFramePosWS);
 
-                    posWS = matrix.MultiplyPoint3x4(lastFramePosOS);
+					posWS = matrix.MultiplyPoint3x4(lastFramePosOS);
 
-                    // Unoptimized: 
-                    // newPos = posWS + (lastFramePosWS - posWS) + (gravity * (timestep * timestep));
+					// Unoptimized: 
+					// newPos = posWS + (lastFramePosWS - posWS) + (gravity * (timestep * timestep));
 
-                    // Optimized version:
-                    newPos.x = posWS.x + (lastFramePosWS.x - posWS.x) + (gravity.x * timestepSqr);
-                    newPos.y = posWS.y + (lastFramePosWS.y - posWS.y) + (gravity.y * timestepSqr);
-                    newPos.z = posWS.z + (lastFramePosWS.z - posWS.z) + (gravity.z * timestepSqr);
+					// Optimized version:
+					newPos.x = posWS.x + (lastFramePosWS.x - posWS.x) + (gravity.x * timestepSqr);
+					newPos.y = posWS.y + (lastFramePosWS.y - posWS.y) + (gravity.y * timestepSqr);
+					newPos.z = posWS.z + (lastFramePosWS.z - posWS.z) + (gravity.z * timestepSqr);
 
-                    vertices[i] = newPos;
-                }
-            }
+					vertices[i] = newPos;
+				}
+			}
 
-            // Set dirty
-            this.instance.vertices.SetGPUDirty();
-        }
-    }
+			// Set dirty
+			this.instance.vertices.SetGPUDirty();
+		}
+	}
 }

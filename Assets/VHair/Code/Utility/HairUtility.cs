@@ -5,10 +5,10 @@ using System.Text;
 
 namespace VHair
 {
-    /// <summary>
-    /// Utility methods for interacting with the VHair hair system.
-    /// </summary>
-    public static class HairUtility
-    {
-    }
+	/// <summary>
+	/// Utility methods for interacting with the VHair hair system.
+	/// </summary>
+	public static class HairUtility
+	{
+	}
 }

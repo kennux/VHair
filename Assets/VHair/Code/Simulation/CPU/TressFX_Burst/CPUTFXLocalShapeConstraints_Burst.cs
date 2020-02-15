@@ -9,8 +9,8 @@ using Unity.Burst;
 
 namespace VHair
 {
-    public class CPUTFXLocalShapeConstraints_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
-    {
+	public class CPUTFXLocalShapeConstraints_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
+	{
 		[BurstCompile]
 		struct Job : IJobParallelFor
 		{
@@ -34,8 +34,8 @@ namespace VHair
 				HairStrand strand = this.strands[index];
 				quaternion rotGlobal = this.globalTransform[strand.firstVertex];
 				
-                for (int j = strand.firstVertex+1; j < strand.lastVertex-1; j++)
-                {
+				for (int j = strand.firstVertex+1; j < strand.lastVertex-1; j++)
+				{
 					quaternion rotGlobalWorld = math.mul(rotation,rotGlobal);
 
 					float3 p1 = vertices[j], p2 = vertices[j + 1];
@@ -52,25 +52,25 @@ namespace VHair
 					rotGlobal = math.mul(rotGlobal, quaternion.LookRotation(math.normalize(math.mul(math.inverse(rotGlobalWorld), vec)), new float3(0,1,0)));
 					vertices[j] = p1;
 					vertices[j+1] = p2;
-                }
+				}
 			}
 		}
 
 		// Settings
-        public float stiffness;
+		public float stiffness;
 		
 		// Local
 		[NonSerialized]
 		[HideInInspector]
-        public NativeArray<quaternion> localTransform;
+		public NativeArray<quaternion> localTransform;
 
 		// Global
 		[NonSerialized]
 		[HideInInspector]
-        public NativeArray<quaternion> globalTransform;
+		public NativeArray<quaternion> globalTransform;
 
 		// Other
-        private NativeArray<float3> referenceVectors;
+		private NativeArray<float3> referenceVectors;
 
 		public void OnDestroy()
 		{
@@ -80,10 +80,10 @@ namespace VHair
 		}
 
 		public override void InitializeSimulation()
-        {
-            this.localTransform = new NativeArray<quaternion>(this.instance.vertexCount, Allocator.Persistent);
-            this.globalTransform = new NativeArray<quaternion>(this.instance.vertexCount, Allocator.Persistent);
-            this.referenceVectors = new NativeArray<float3>(this.instance.vertexCount, Allocator.Persistent);
+		{
+			this.localTransform = new NativeArray<quaternion>(this.instance.vertexCount, Allocator.Persistent);
+			this.globalTransform = new NativeArray<quaternion>(this.instance.vertexCount, Allocator.Persistent);
+			this.referenceVectors = new NativeArray<float3>(this.instance.vertexCount, Allocator.Persistent);
 
 			for (int i = 0; i < this.instance.vertexCount; i++)
 			{
@@ -92,25 +92,25 @@ namespace VHair
 				this.referenceVectors[i] = Vector3.zero;
 			}
 
-            HairStrand[] strands = this.instance.asset.CreateStrandDataCopy();
-            float3[] vertices = this.instance.asset.CreateVertexDataCopy();
-            this.CalculateTransforms(strands, vertices, this.localTransform, this.globalTransform, this.referenceVectors);
-        }
+			HairStrand[] strands = this.instance.asset.CreateStrandDataCopy();
+			float3[] vertices = this.instance.asset.CreateVertexDataCopy();
+			this.CalculateTransforms(strands, vertices, this.localTransform, this.globalTransform, this.referenceVectors);
+		}
 
-        private void CalculateTransforms(HairStrand[] strands, float3[] vertices, NativeArray<quaternion> localTransforms, NativeArray<quaternion> globalTransforms, NativeArray<float3> referenceVectors)
-        {
-            for (int i = 0; i < strands.Length; i++)
-            {
-                HairStrand strand = strands[i];
-                int j;
+		private void CalculateTransforms(HairStrand[] strands, float3[] vertices, NativeArray<quaternion> localTransforms, NativeArray<quaternion> globalTransforms, NativeArray<float3> referenceVectors)
+		{
+			for (int i = 0; i < strands.Length; i++)
+			{
+				HairStrand strand = strands[i];
+				int j;
 
 				// First vertex
 				Quaternion local;
 				local = globalTransforms[strand.firstVertex] = localTransforms[strand.firstVertex] = Quaternion.LookRotation(math.normalize(vertices[strand.firstVertex + 1] - vertices[strand.firstVertex]));
 
-                for (j = strand.firstVertex+1; j < strand.lastVertex; j++)
-                {
-                    Vector3 p1 = vertices[j-1], p2 = vertices[j], d = (p2 - p1);
+				for (j = strand.firstVertex+1; j < strand.lastVertex; j++)
+				{
+					Vector3 p1 = vertices[j-1], p2 = vertices[j], d = (p2 - p1);
 					Vector3 vec = Quaternion.Inverse(globalTransforms[j - 1]) * d;
 					if (vec.magnitude < 0.001f)
 						local = Quaternion.identity;
@@ -119,13 +119,13 @@ namespace VHair
 
 					referenceVectors[j] = vec;
 					globalTransforms[j] = globalTransforms[j-1] * local;
-                    localTransforms[j] = local;
-                }
-            }
-        }
+					localTransforms[j] = local;
+				}
+			}
+		}
 
-        protected override void _SimulationStep(float timestep)
-        {
+		protected override void _SimulationStep(float timestep)
+		{
 			float stiffness = .5f * Mathf.Min(this.stiffness * timestep, .95f);
 			Job job = new Job()
 			{
@@ -140,6 +140,6 @@ namespace VHair
 			};
 			
 			this.simulation.jobHandle = job.Schedule(this.simulation.strands.Length, 32, this.simulation.jobHandle);
-        }
-    }
+		}
+	}
 }

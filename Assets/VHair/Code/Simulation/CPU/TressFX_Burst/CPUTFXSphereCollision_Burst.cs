@@ -8,8 +8,8 @@ using Unity.Burst;
 
 namespace VHair
 {
-    public class CPUTFXSphereCollision_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
-    {
+	public class CPUTFXSphereCollision_Burst : HairSimulationPass<CPUTFXPhysicsSimulation_Burst>
+	{
 		[BurstCompile]
 		struct Job : IJobParallelFor
 		{
@@ -23,42 +23,42 @@ namespace VHair
 			public NativeArray<float3> vertices;
 			public void Execute(int i)
 			{
-                // Is hair movable?
-                if (HairMovability.IsMovable(i, movability))
-                {
-                    bool wasModified = false;
-                    float3 v = vertices[i];
-                    for (int j = 0; j < colliderCount; j++)
-                    {
-                        // Read collider
-                        var c = colliders[j];
+				// Is hair movable?
+				if (HairMovability.IsMovable(i, movability))
+				{
+					bool wasModified = false;
+					float3 v = vertices[i];
+					for (int j = 0; j < colliderCount; j++)
+					{
+						// Read collider
+						var c = colliders[j];
 
-                        // Intersection?
-                        float3 dir = (v - c.center);
-                        float sqMag = math.lengthsq(dir);
-                        if (sqMag <= c.radiusSq) // if (Vector3.Distance(v, c.center) <= c.radius)
-                        {
-                            // Intersection! push the vertex out
-                            float d = math.sqrt(sqMag); // dir.magnitude;
-                            v += (dir / d) * (c.radius - d);
-                            wasModified = true;
-                        }
-                    }
+						// Intersection?
+						float3 dir = (v - c.center);
+						float sqMag = math.lengthsq(dir);
+						if (sqMag <= c.radiusSq) // if (Vector3.Distance(v, c.center) <= c.radius)
+						{
+							// Intersection! push the vertex out
+							float d = math.sqrt(sqMag); // dir.magnitude;
+							v += (dir / d) * (c.radius - d);
+							wasModified = true;
+						}
+					}
 
-                    if (wasModified)
-                        vertices[i] = v; // Sync
-                }
+					if (wasModified)
+						vertices[i] = v; // Sync
+				}
 			}
 		}
 
-        public SphereCollider[] colliders;
+		public SphereCollider[] colliders;
 
-        private struct CollisionSphere
-        {
-            public float3 center;
-            public float radius;
-            public float radiusSq;
-        }
+		private struct CollisionSphere
+		{
+			public float3 center;
+			public float radius;
+			public float radiusSq;
+		}
 
 		private NativeArray<CollisionSphere> _colliders;
 
@@ -70,23 +70,23 @@ namespace VHair
 			_colliders = new NativeArray<CollisionSphere>(this.colliders.Length, Allocator.Persistent);
 		}
 
-        public override void InitializeSimulation()
-        {
+		public override void InitializeSimulation()
+		{
 			UpdateColliders(false);
-        }
+		}
 
-        protected override void _SimulationStep(float timestep)
-        {
-            for (int i = 0; i < this.colliders.Length; i++)
-            {
+		protected override void _SimulationStep(float timestep)
+		{
+			for (int i = 0; i < this.colliders.Length; i++)
+			{
 				float radius = this.colliders[i].radius * Mathf.Max(Mathf.Max(this.colliders[i].transform.lossyScale.x, this.colliders[i].transform.lossyScale.y), this.colliders[i].transform.lossyScale.z);
-                _colliders[i] = new CollisionSphere()
-                {
-                    center = this.colliders[i].transform.TransformPoint(this.colliders[i].center),
-                    radius = radius,
-                    radiusSq = radius * radius
-                };
-            }
+				_colliders[i] = new CollisionSphere()
+				{
+					center = this.colliders[i].transform.TransformPoint(this.colliders[i].center),
+					radius = radius,
+					radiusSq = radius * radius
+				};
+			}
 
 			Job job = new Job()
 			{
@@ -97,7 +97,7 @@ namespace VHair
 			};
 			
 			this.simulation.jobHandle = job.Schedule(this.simulation.vertices.Length, 128, this.simulation.jobHandle);
-        }
+		}
 
 		public void OnDestroy()
 		{

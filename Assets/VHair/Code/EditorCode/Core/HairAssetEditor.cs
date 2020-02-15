@@ -7,56 +7,56 @@ using Unity.Mathematics;
 
 namespace VHair.Editor
 {
-    [CustomEditor(typeof(HairAsset))]
-    public class HairAssetEditor : UnityEditor.Editor
-    {
-        private IHairAssetImporter currentImporter;
+	[CustomEditor(typeof(HairAsset))]
+	public class HairAssetEditor : UnityEditor.Editor
+	{
+		private IHairAssetImporter currentImporter;
 		private IHairAssetProcessor currentProcessor;
 
-        public override void OnInspectorGUI()
-        {
-            var target = (this.target as HairAsset);
+		public override void OnInspectorGUI()
+		{
+			var target = (this.target as HairAsset);
 
-            // Render importer
-            var importers = HairImport.GetImporters();
-            int currentSelected = importers.IndexOf(this.currentImporter);
-            int newSelected = EditorGUILayout.Popup("Importer: ", currentSelected == -1 ? 0 : currentSelected, importers.Select((importer) => importer.displayName).ToArray());
+			// Render importer
+			var importers = HairImport.GetImporters();
+			int currentSelected = importers.IndexOf(this.currentImporter);
+			int newSelected = EditorGUILayout.Popup("Importer: ", currentSelected == -1 ? 0 : currentSelected, importers.Select((importer) => importer.displayName).ToArray());
 
-            if (currentSelected != newSelected)
-            {
-                this.currentImporter = importers[newSelected];
-            }
+			if (currentSelected != newSelected)
+			{
+				this.currentImporter = importers[newSelected];
+			}
 
-            // Importer set?
-            if (!ReferenceEquals(this.currentImporter, null))
-            {
-                EditorGUI.BeginDisabledGroup(!this.currentImporter.OnInspectorGUI(target));
+			// Importer set?
+			if (!ReferenceEquals(this.currentImporter, null))
+			{
+				EditorGUI.BeginDisabledGroup(!this.currentImporter.OnInspectorGUI(target));
 
-                if (GUILayout.Button("Import"))
-                {
+				if (GUILayout.Button("Import"))
+				{
 					// Temporary variables
 					float3[] vertices;
-                    HairStrand[] strands;
+					HairStrand[] strands;
 
-                    // Import
-                    this.currentImporter.Import(out vertices, out strands);
-                    target.InitializeVertices(vertices);
-                    target.InitializeStrands(strands);
-                    target.InitializeMovability();
-                    target.wasImported = true;
+					// Import
+					this.currentImporter.Import(out vertices, out strands);
+					target.InitializeVertices(vertices);
+					target.InitializeStrands(strands);
+					target.InitializeMovability();
+					target.wasImported = true;
 
-                    // Mark dirty
-                    EditorUtility.SetDirty(target);
-                }
+					// Mark dirty
+					EditorUtility.SetDirty(target);
+				}
 
-                EditorGUI.EndDisabledGroup();
-            }
+				EditorGUI.EndDisabledGroup();
+			}
 
-            // Render actual inspector
-            if (target.wasImported)
-            {
-                EditorGUILayout.LabelField("Strand count: " + target.StrandCount);
-                EditorGUILayout.LabelField("Vertex count: " + target.VertexCount);
+			// Render actual inspector
+			if (target.wasImported)
+			{
+				EditorGUILayout.LabelField("Strand count: " + target.StrandCount);
+				EditorGUILayout.LabelField("Vertex count: " + target.VertexCount);
 
 				// Render processor
 				var processors = HairAssetProcessors.GetProcessors();
@@ -79,7 +79,7 @@ namespace VHair.Editor
 						EditorUtility.SetDirty(target);
 					}
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 }

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace VHair
 {
-    public interface IHairProcessor
-    {
-    }
+	public interface IHairProcessor
+	{
+	}
 }
