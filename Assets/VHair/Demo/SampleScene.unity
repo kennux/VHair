@@ -1139,6 +1139,16 @@ PrefabInstance:
       propertyPath: m_LocalScale.x
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114032647870134764, guid: a077cfdbf7324d147b1452a800c5d127,
+        type: 3}
+      propertyPath: update
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048940075926844, guid: a077cfdbf7324d147b1452a800c5d127,
+        type: 3}
+      propertyPath: update
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 114276910172793928, guid: a077cfdbf7324d147b1452a800c5d127,
         type: 3}
       propertyPath: windZone
@@ -1149,6 +1159,11 @@ PrefabInstance:
       propertyPath: windZone
       value: 
       objectReference: {fileID: 600566120}
+    - target: {fileID: 114334004863372610, guid: a077cfdbf7324d147b1452a800c5d127,
+        type: 3}
+      propertyPath: update
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 114527081811338800, guid: a077cfdbf7324d147b1452a800c5d127,
         type: 3}
       propertyPath: windZone

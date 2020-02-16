@@ -23,11 +23,15 @@ namespace VHair
 			UPDATE,
 			FIXED_UPDATE,
 			LATE_UPDATE,
+			UPDATE_FIXED_TIMESTEP,
+			LATE_UPDATE_FIXED_TIMESTEP,
 			SCRIPTED
 		}
 
 		public SimulationUpdating update;
 		private List<IHairSimulationPass> passes = new List<IHairSimulationPass>();
+
+		private float fixedTimestepPassed;
 
 		/// <summary>
 		/// Updates <see cref="passes"/>
@@ -76,12 +80,30 @@ namespace VHair
 		{
 			if (this.update == SimulationUpdating.UPDATE)
 				_Update(Time.deltaTime);
+			else if (this.update == SimulationUpdating.UPDATE_FIXED_TIMESTEP)
+			{
+				fixedTimestepPassed += Time.deltaTime;
+				while (fixedTimestepPassed >= Time.fixedDeltaTime)
+				{
+					_Update(Time.fixedDeltaTime);
+					fixedTimestepPassed -= Time.fixedDeltaTime;
+				}
+			}
 		}
 
 		public void LateUpdate()
 		{
 			if (this.update == SimulationUpdating.LATE_UPDATE)
 				_Update(Time.deltaTime);
+			else if (this.update == SimulationUpdating.LATE_UPDATE_FIXED_TIMESTEP)
+			{
+				fixedTimestepPassed += Time.deltaTime;
+				while (fixedTimestepPassed >= Time.fixedDeltaTime)
+				{
+					_Update(Time.fixedDeltaTime);
+					fixedTimestepPassed -= Time.fixedDeltaTime;
+				}
+			}
 		}
 
 		public void FixedUpdate()
