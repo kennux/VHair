@@ -15,6 +15,7 @@
     "com.unity.timeline": "1.2.10",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.legacyinputhelpers": "2.0.2",
+    "net.kennux.unitytk": "ssh://git@github.com/kennux/UnityTK.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
@@ -46,5 +47,11 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
+  },
+  "lock": {
+    "net.kennux.unitytk": {
+      "revision": "HEAD",
+      "hash": "d877e2e7dc634d9d6584aa18a2155fac6830a12e"
+    }
   }
 }
