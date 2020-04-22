@@ -48,6 +48,7 @@ namespace VHair
 			public float3 facing;
 			public float4x4 worldToLocal;
 			public float hairWidth;
+			public float3 fixedNormal;
 
 			[ReadOnly]
 			public NativeArray<float3> hairVertices;
@@ -89,7 +90,7 @@ namespace VHair
 				vertices[segment.v3] = v3;
 				vertices[segment.v4] = v4;
 
-				n1 = n2 = n3 = n4 = math.mul(quaternion.LookRotation(math.normalize(p2 - p1), new float3(0,1,0)), new float3(0,1,0));
+				n1 = n2 = n3 = n4 = math.lengthsq(fixedNormal) > 0 ? fixedNormal : math.mul(quaternion.LookRotation(math.normalize(p2 - p1), new float3(0,1,0)), new float3(0,1,0));
 				normals[segment.v1] = n1;
 				normals[segment.v2] = n2;
 				normals[segment.v3] = n3;
@@ -102,6 +103,7 @@ namespace VHair
 		public float hairWidth = .1f;
 		public AnimationCurve hairWidthMultiplicatorCurve = AnimationCurve.Linear(0, 1, 1, 1);
 		public UVDistributionStrategy uvDistStrat;
+		public Vector3 fixedNormal;
 		
 		private new MeshRenderer renderer;
 		private MeshFilter filter;
@@ -218,7 +220,7 @@ namespace VHair
 
 			LateUpdate();
 			this.mesh.RecalculateBounds();
-			this.mesh.bounds = new Bounds(this.mesh.bounds.center, this.mesh.bounds.size * 3f); // Approximation, real bounding box calculation is difficult to do fast.
+			this.mesh.bounds = new Bounds(this.mesh.bounds.center, Vector3.Scale(transform.lossyScale, this.mesh.bounds.size) * 3f); // Approximation, real bounding box calculation is difficult to do fast.
 		}
 
 		private JobHandle handle;
@@ -234,7 +236,8 @@ namespace VHair
 				vertices = this.triVertices,
 				facing = this.facing.position,
 				hairWidth = CurrentHairWidth,
-				worldToLocal = this.transform.worldToLocalMatrix
+				worldToLocal = this.transform.worldToLocalMatrix,
+				fixedNormal = fixedNormal
 			}.Schedule(this.segments.Length, 16);
 
 			JobHandle.ScheduleBatchedJobs();
