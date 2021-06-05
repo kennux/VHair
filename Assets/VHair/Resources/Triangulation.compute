@@ -1,0 +1,106 @@
+#pragma kernel TriangulateGroup
+#pragma kernel TriangulateSingle
+
+struct Vertex
+{
+	float3 position;
+	float3 normal;
+	float3 tangent;
+	float2 uv;
+};
+
+struct Strand
+{
+	int firstVertex;
+	int lastVertex;
+};
+
+// Destination
+RWStructuredBuffer<Vertex> rVertexBuffer;
+RWStructuredBuffer<uint> rIndexBuffer;
+
+// Input
+RWStructuredBuffer<Strand> pStrands;
+RWStructuredBuffer<float3> pVertices;
+float3 pFacingPos;
+float4x4 pWorldToLocal;
+float3 pFixedNormal;
+float pHairWidth;
+int pUvDistStrategy;
+
+void Triangulate(uint id)
+{
+	Strand strand = pStrands[id];
+
+	for (int i = strand.firstVertex; i < strand.lastVertex - 1; i++)
+	{
+		float3 p1 = pVertices[i];
+		float3 p2 = pVertices[i+1];
+
+		float3 p2To1 = (p2 - p1);
+		float3 facingDir = normalize(((p2 - pFacingPos) + (p1 - pFacingPos)) / 2.0);
+
+		float3 left = normalize(cross(p2To1, facingDir));
+		float3 v1 = p1 + pHairWidth * left;
+		float3 v2 = p1 + pHairWidth * -left;
+		float3 v3 = p2 + pHairWidth * left;
+		float3 v4 = p2 + pHairWidth * -left;
+
+		v1 = mul(pWorldToLocal, float4(v1.x, v1.y, v1.z, 1)).xyz;
+		v2 = mul(pWorldToLocal, float4(v2.x, v2.y, v2.z, 1)).xyz;
+		v3 = mul(pWorldToLocal, float4(v3.x, v3.y, v3.z, 1)).xyz;
+		v4 = mul(pWorldToLocal, float4(v4.x, v4.y, v4.z, 1)).xyz;
+
+		Vertex vert1 = (Vertex)0;
+		Vertex vert2 = (Vertex)0;
+		Vertex vert3 = (Vertex)0;
+		Vertex vert4 = (Vertex)0;
+
+		// TODO: Uv and Normal
+		vert1.position = v1;
+		vert1.normal = pFixedNormal;
+		vert1.tangent = normalize(p2To1);
+		vert1.uv = float2(0, 0);
+
+		vert2.position = v2;
+		vert2.normal = pFixedNormal;
+		vert2.tangent = normalize(p2To1);
+		vert2.uv = float2(0, 0);
+
+		vert3.position = v3;
+		vert3.normal = pFixedNormal;
+		vert3.tangent = normalize(p2To1);
+		vert3.uv = float2(0, 0);
+
+		vert4.position = v4;
+		vert4.normal = pFixedNormal;
+		vert4.tangent = normalize(p2To1);
+		vert4.uv = float2(0, 0);
+
+		uint vertexBase = (i - id) * 4;
+		rVertexBuffer[vertexBase] = vert1;
+		rVertexBuffer[vertexBase + 1] = vert2;
+		rVertexBuffer[vertexBase + 2] = vert3;
+		rVertexBuffer[vertexBase + 3] = vert4;
+
+		uint indexBase = (i - id) * 6;
+		rIndexBuffer[indexBase] = vertexBase;
+		rIndexBuffer[indexBase+1] = vertexBase + 1;
+		rIndexBuffer[indexBase+2] = vertexBase + 3;
+		rIndexBuffer[indexBase+3] = vertexBase + 3;
+		rIndexBuffer[indexBase+4] = vertexBase + 2;
+		rIndexBuffer[indexBase+5] = vertexBase;
+	}
+}
+
+[numthreads(32, 1, 1)]
+void TriangulateGroup(uint3 id : SV_DispatchThreadID)
+{
+	Triangulate(id.x);
+}
+
+[numthreads(1, 1, 1)]
+void TriangulateSingle(uint3 id : SV_DispatchThreadID)
+{
+	Triangulate(id.x);
+}

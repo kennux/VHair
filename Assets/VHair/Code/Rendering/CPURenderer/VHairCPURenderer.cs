@@ -13,9 +13,12 @@ namespace VHair
 	/// <summary>
 	/// A "standard" renderer implementation that does nothing else except synchronizing the simulation data to a mesh generated at runtime.
 	/// It will only provide a mesh to a mesh renderer and not do any rendering itself at all.
+	/// 
+	/// This implementation uses the CPU to calculate the mesh from the spline data and pushes the data onto the gpu every frame!
+	/// It should only be used in combination with cpu simulation.
 	/// </summary>
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-	public class VHairStandardRenderer : HairRenderer
+	public class VHairCPURenderer : HairRenderer
 	{
 		public enum UVDistributionStrategy
 		{

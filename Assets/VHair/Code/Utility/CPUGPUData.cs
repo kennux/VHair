@@ -26,7 +26,7 @@ namespace VHair
 		/// <summary>
 		/// Gpu side of the data
 		/// </summary>
-		private ComputeBuffer gpuData;
+		private GraphicsBuffer gpuData;
 
 		private bool gpuDirty;
 		private bool cpuDirty;
@@ -48,7 +48,7 @@ namespace VHair
 			}
 		}
 
-		public ComputeBuffer GpuReference
+		public GraphicsBuffer GpuReference
 		{
 			get
 			{
@@ -60,14 +60,14 @@ namespace VHair
 
 		public CPUGPUData(T[] data, int dataStride)
 		{
-			this.gpuData = new ComputeBuffer(data.Length, dataStride);
+			this.gpuData = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, data.Length, dataStride);
 			this.cpuData = new NativeArray<T>(data, Allocator.Persistent);
 			this.UpdateGPUData();
 		}
 
 		public CPUGPUData(NativeArray<T> data, int dataStride)
 		{
-			this.gpuData = new ComputeBuffer(data.Length, dataStride);
+			this.gpuData = new GraphicsBuffer(GraphicsBuffer.Target.Structured | GraphicsBuffer.Target.CopySource | GraphicsBuffer.Target.CopyDestination, data.Length, dataStride);
 			this.cpuData = data;
 			this.UpdateGPUData();
 		}

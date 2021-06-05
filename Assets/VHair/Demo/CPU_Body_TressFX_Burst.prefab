@@ -1638,7 +1638,7 @@ GameObject:
   - component: {fileID: 33232702632877818}
   - component: {fileID: 23039010951339096}
   m_Layer: 0
-  m_Name: Body_TressFX_Burst
+  m_Name: CPU_Body_TressFX_Burst
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -48,6 +48,7 @@ namespace VHair
 			{
 				vertices[i] = this.prevFrameMatrix.MultiplyPoint3x4(vertices[i]);
 			}
+			this.instance.vertices.SetGPUDirty();
 		}
 
 		public JobHandle jobHandle;

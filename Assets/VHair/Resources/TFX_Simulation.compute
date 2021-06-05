@@ -1,0 +1,304 @@
+struct Strand
+{
+	int firstVertex;
+	int lastVertex;
+};
+
+RWStructuredBuffer<float3> sPrevFrameVertices;
+RWStructuredBuffer<float3> sInitialVertices;
+RWStructuredBuffer<float3> sVertices;
+RWStructuredBuffer<Strand> sStrands;
+RWStructuredBuffer<uint> sMovability;
+
+// Shared
+float pTimestep;
+float4x4 pLocalToWorld;
+float pStiffness;
+int pColliderCount;
+
+// Verlet
+float4x4 pInvPrevLocalToWorld;
+float3 pGravity;
+
+// Length constraints
+RWStructuredBuffer<float> sLengths;
+
+// Global shape constraints
+int pVertexRange;
+
+// Local shape constraints
+RWStructuredBuffer<float4> sGlobalTransforms;
+RWStructuredBuffer<float4> sLocalTransforms;
+RWStructuredBuffer<float3> sRefVectors;
+float4 pRotation;
+
+// Wind
+float3 pWindForce;
+
+// Sphere collision
+struct CollisionSphere
+{
+	float3 center;
+	float radius;
+	float radiusSq;
+};
+
+RWStructuredBuffer<CollisionSphere> sCollisionSpheres;
+
+bool IsMovable(uint index)
+{
+	int dataIndex = index / 32;
+	return (sMovability[dataIndex] & (1u << (index % 32))) != 0;
+}
+
+float4 QuatFromMat(float3x3 m)
+{
+	float3 u = m[0];
+	float3 v = m[1];
+	float3 w = m[2];
+
+	uint u_sign = (asuint(u.x) & 0x80000000);
+	float t = v.y + asfloat(asuint(w.z) ^ u_sign);
+	uint4 u_mask = (int)u_sign >> 31;
+	uint4 t_mask = asint(t) >> 31;
+
+	float tr = 1.0f + abs(u.x);
+
+	uint4 sign_flips = uint4(0x00000000, 0x80000000, 0x80000000, 0x80000000) ^ (u_mask & uint4(0x00000000, 0x80000000, 0x00000000, 0x80000000)) ^ (t_mask & uint4(0x80000000, 0x80000000, 0x80000000, 0x00000000));
+
+	float4 value = float4(tr, u.y, w.x, v.z) + asfloat(asuint(float4(t, v.x, u.z, w.y)) ^ sign_flips);   // +---, +++-, ++-+, +-++
+
+	value = asfloat((asuint(value) & ~u_mask) | (asuint(value.zwxy) & u_mask));
+	value = asfloat((asuint(value.wzyx) & ~t_mask) | (asuint(value) & t_mask));
+	value = normalize(value);
+
+	return value;
+}
+
+float4 MulQuatQuat(float4 a, float4 b)
+{
+	return a.wwww * b + (a.xyzx * b.wwwx + a.yzxy * b.zxyy) * float4(1.0f, 1.0f, 1.0f, -1.0f) - a.zxyz * b.yzxz;
+}
+
+float3 MulQuatVec(float4 q, float3 vec)
+{
+	float3 t = 2 * cross(q.xyz, vec);
+	return vec + q.w * t + cross(q.xyz, t);
+}
+
+float4 InverseQuaternion(float4 x)
+{
+	return rcp(dot(x, x)) * x * float4(-1.0f, -1.0f, -1.0f, 1.0f);
+}
+
+float4 LookRotation(float3 forward, float3 up)
+{
+	float3 t = normalize(cross(up, forward));
+	return QuatFromMat(float3x3(t, cross(forward, t), forward));
+}
+
+void LocalShapeConstraints(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+	float4 rotGlobal = sGlobalTransforms[strand.firstVertex];
+
+	for (int j = strand.firstVertex + 1; j < strand.lastVertex - 1; j++)
+	{
+		float4 rotGlobalWorld = MulQuatQuat(pRotation, rotGlobal);
+
+		float3 p1 = sVertices[j], p2 = sVertices[j + 1];
+		float3 orgP2 = MulQuatVec(rotGlobalWorld, sRefVectors[j + 1]) + p1;
+		float3 delta = pStiffness * (orgP2 - p2);
+
+		if (IsMovable(j))
+			p1 -= delta;
+		if (IsMovable(j + 1))
+			p2 += delta;
+
+		float3 vec = normalize(p2 - p1);
+
+		rotGlobal = MulQuatQuat(rotGlobal, LookRotation(normalize(MulQuatVec(InverseQuaternion(rotGlobalWorld), vec)), float3(0, 1, 0)));
+		sVertices[j] = p1;
+		sVertices[j + 1] = p2;
+	}
+}
+
+void GlobalShapeConstraints(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+	int target = min(strand.firstVertex + pVertexRange, strand.lastVertex);
+	for (int i = strand.firstVertex; i <= target; i++)
+	{
+		if (!IsMovable(i))
+			continue;
+
+		float3 iV = sInitialVertices[i], v = sVertices[i];
+		float4 iV4 = float4(iV.x, iV.y, iV.z, 1);
+		iV = mul(pLocalToWorld, iV4).xyz;
+
+		float3 delta = (iV - v);
+		sVertices[i] = v + (delta * pStiffness * pTimestep);
+	}
+}
+
+void LengthConstraints(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+	for (int j = strand.firstVertex + 1; j <= strand.lastVertex; j++)
+	{
+		if (!IsMovable(j))
+			continue;
+
+		float nDist = sLengths[j];
+		float3 p = sVertices[j], pPrev = sVertices[j - 1], pDir = (p - pPrev);
+		float dist = length(pDir);
+		float distDiff = (nDist - dist);
+
+		sVertices[j] = p + ((pDir / dist) * (distDiff * pStiffness * pTimestep));
+	}
+}
+
+void Verlet(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+
+	float3 initialPos = sInitialVertices[strand.firstVertex];
+
+	for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
+	{
+		if (!IsMovable(i))
+		{
+			sVertices[strand.firstVertex] = mul(pLocalToWorld, float4(initialPos, 1)).xyz;
+			continue;
+		}
+
+		float3 lastFramePosWS = sVertices[i];
+		sVertices[i] = sVertices[i] + (lastFramePosWS - sVertices[i]) + (pGravity * (pTimestep * pTimestep));
+	}
+}
+
+void Wind(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+
+	for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
+	{
+		if (!IsMovable(i))
+			continue;
+
+		sVertices[i] += pWindForce;
+	}
+}
+
+void SphereCollision(uint strandId)
+{
+	Strand strand = sStrands[strandId];
+
+	for (int i = strand.firstVertex; i <= strand.lastVertex; i++)
+	{
+		if (!IsMovable(i))
+			continue;
+
+		float3 v = sVertices[i];
+		for (int j = 0; j < pColliderCount; j++)
+		{
+			// Read collider
+			CollisionSphere c = sCollisionSpheres[j];
+
+			// Intersection?
+			float3 dir = (v - c.center);
+			float d = length(dir);
+			if (d <= c.radius) // if (Vector3.Distance(v, c.center) <= c.radius)
+			{
+				// Intersection! push the vertex out
+				v += (dir / d) * (c.radius - d);
+			}
+		}
+
+		sVertices[i] = v; // Sync
+	}
+}
+
+#pragma kernel VerletGroup
+[numthreads(32, 1, 1)]
+void VerletGroup(uint3 id : SV_DispatchThreadID)
+{
+	Verlet(id.x);
+}
+
+#pragma kernel VerletSingle
+[numthreads(1, 1, 1)]
+void VerletSingle(uint3 id : SV_DispatchThreadID)
+{
+	Verlet(id.x);
+}
+
+#pragma kernel LengthConstraintsGroup
+[numthreads(32, 1, 1)]
+void LengthConstraintsGroup(uint3 id : SV_DispatchThreadID)
+{
+	LengthConstraints(id.x);
+}
+
+#pragma kernel LengthConstraintsSingle
+[numthreads(1, 1, 1)]
+void LengthConstraintsSingle(uint3 id : SV_DispatchThreadID)
+{
+	LengthConstraints(id.x);
+}
+
+#pragma kernel GlobalShapeConstraintsGroup
+[numthreads(32, 1, 1)]
+void GlobalShapeConstraintsGroup(uint3 id : SV_DispatchThreadID)
+{
+	GlobalShapeConstraints(id.x);
+}
+
+#pragma kernel GlobalShapeConstraintsSingle
+[numthreads(1, 1, 1)]
+void GlobalShapeConstraintsSingle(uint3 id : SV_DispatchThreadID)
+{
+	GlobalShapeConstraints(id.x);
+}
+
+#pragma kernel LocalShapeConstraintsGroup
+[numthreads(32, 1, 1)]
+void LocalShapeConstraintsGroup(uint3 id : SV_DispatchThreadID)
+{
+	LocalShapeConstraints(id.x);
+}
+
+#pragma kernel LocalShapeConstraintsSingle
+[numthreads(1, 1, 1)]
+void LocalShapeConstraintsSingle(uint3 id : SV_DispatchThreadID)
+{
+	LocalShapeConstraints(id.x);
+}
+
+#pragma kernel WindGroup
+[numthreads(32, 1, 1)]
+void WindGroup(uint3 id : SV_DispatchThreadID)
+{
+	Wind(id.x);
+}
+
+#pragma kernel WindSingle
+[numthreads(1, 1, 1)]
+void WindSingle(uint3 id : SV_DispatchThreadID)
+{
+	Wind(id.x);
+}
+
+#pragma kernel SphereCollisionGroup
+[numthreads(32, 1, 1)]
+void SphereCollisionGroup(uint3 id : SV_DispatchThreadID)
+{
+	SphereCollision(id.x);
+}
+
+#pragma kernel SphereCollisionSingle
+[numthreads(1, 1, 1)]
+void SphereCollisionSingle(uint3 id : SV_DispatchThreadID)
+{
+	SphereCollision(id.x);
+}

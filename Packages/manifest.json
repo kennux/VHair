@@ -2,20 +2,19 @@
   "dependencies": {
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
-    "com.unity.burst": "1.2.0",
-    "com.unity.collections": "0.0.9-preview.20",
-    "com.unity.ext.nunit": "1.0.0",
-    "com.unity.ide.rider": "1.1.4",
-    "com.unity.ide.vscode": "1.1.4",
-    "com.unity.jobs": "0.0.7-preview.13",
-    "com.unity.mathematics": "1.1.0",
-    "com.unity.memoryprofiler": "0.1.0-preview.7",
-    "com.unity.multiplayer-hlapi": "1.0.4",
-    "com.unity.postprocessing": "2.3.0",
-    "com.unity.test-framework": "1.1.11",
-    "com.unity.timeline": "1.2.10",
+    "com.unity.burst": "1.6.0-pre.2",
+    "com.unity.collections": "0.17.0-preview.18",
+    "com.unity.ext.nunit": "1.0.6",
+    "com.unity.ide.rider": "3.0.6",
+    "com.unity.ide.visualstudio": "2.0.8",
+    "com.unity.ide.vscode": "1.2.3",
+    "com.unity.jobs": "0.8.0-preview.23",
+    "com.unity.mathematics": "1.2.1",
+    "com.unity.postprocessing": "3.1.0",
+    "com.unity.test-framework": "1.1.24",
+    "com.unity.timeline": "1.6.0-pre.5",
     "com.unity.ugui": "1.0.0",
-    "com.unity.xr.legacyinputhelpers": "2.0.2",
+    "com.unity.xr.legacyinputhelpers": "2.1.7",
     "net.kennux.unitytk": "ssh://git@github.com/kennux/UnityTK.git",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
@@ -27,6 +26,7 @@
     "com.unity.modules.imageconversion": "1.0.0",
     "com.unity.modules.imgui": "1.0.0",
     "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.modules.nvidia": "1.0.0",
     "com.unity.modules.particlesystem": "1.0.0",
     "com.unity.modules.physics": "1.0.0",
     "com.unity.modules.physics2d": "1.0.0",
@@ -48,11 +48,5 @@
     "com.unity.modules.vr": "1.0.0",
     "com.unity.modules.wind": "1.0.0",
     "com.unity.modules.xr": "1.0.0"
-  },
-  "lock": {
-    "net.kennux.unitytk": {
-      "revision": "HEAD",
-      "hash": "d877e2e7dc634d9d6584aa18a2155fac6830a12e"
-    }
   }
 }

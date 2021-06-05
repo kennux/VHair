@@ -13,7 +13,7 @@ namespace VHair
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
 	public class VHairProxyRenderer : MonoBehaviour
 	{
-		public VHairStandardRenderer hairRenderer;
+		public VHairCPURenderer hairRenderer;
 
 		private new MeshRenderer renderer;
 		private MeshFilter filter;
