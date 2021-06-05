@@ -11,7 +11,7 @@ using System.Threading;
 namespace VHair
 {
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-	public class VHairCPUProxyRenderer : MonoBehaviour
+	public class VHairProxyRenderer : MonoBehaviour
 	{
 		public HairRenderer hairRenderer;
 

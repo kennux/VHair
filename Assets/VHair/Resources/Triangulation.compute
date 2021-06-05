@@ -1,3 +1,5 @@
+#include "QuaternionMath.cginc"
+
 #pragma kernel TriangulateGroup
 #pragma kernel TriangulateSingle
 
@@ -56,26 +58,30 @@ void Triangulate(uint id)
 		Vertex vert3 = (Vertex)0;
 		Vertex vert4 = (Vertex)0;
 
-		// TODO: Uv and Normal
+		float3 normal = length(pFixedNormal) > 0 ? pFixedNormal : MulQuatVec(LookRotation(normalize(p2 - p1), float3(0, 1, 0)), float3(0, 1, 0));
+
+		float y = (i - strand.firstVertex) / (strand.lastVertex - strand.firstVertex);
+		float y2 = ((i+1) - strand.firstVertex) / (strand.lastVertex - strand.firstVertex);
+
 		vert1.position = v1;
-		vert1.normal = pFixedNormal;
+		vert1.normal = normal;
 		vert1.tangent = normalize(p2To1);
-		vert1.uv = float2(0, 0);
+		vert1.uv = float2(0, y);
 
 		vert2.position = v2;
-		vert2.normal = pFixedNormal;
+		vert2.normal = normal;
 		vert2.tangent = normalize(p2To1);
-		vert2.uv = float2(0, 0);
+		vert2.uv = float2(1, y);
 
 		vert3.position = v3;
-		vert3.normal = pFixedNormal;
+		vert3.normal = normal;
 		vert3.tangent = normalize(p2To1);
-		vert3.uv = float2(0, 0);
+		vert3.uv = float2(0, y2);
 
 		vert4.position = v4;
-		vert4.normal = pFixedNormal;
+		vert4.normal = normal;
 		vert4.tangent = normalize(p2To1);
-		vert4.uv = float2(0, 0);
+		vert4.uv = float2(1, y2);
 
 		uint vertexBase = (i - id) * 4;
 		rVertexBuffer[vertexBase] = vert1;
