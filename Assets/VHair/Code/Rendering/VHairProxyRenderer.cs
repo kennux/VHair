@@ -11,22 +11,26 @@ using System.Threading;
 namespace VHair
 {
 	[RequireComponent(typeof(MeshRenderer), typeof(MeshFilter))]
-	public class VHairProxyRenderer : MonoBehaviour
+	public class VHairCPUProxyRenderer : MonoBehaviour
 	{
-		public VHairCPURenderer hairRenderer;
+		public HairRenderer hairRenderer;
 
 		private new MeshRenderer renderer;
 		private MeshFilter filter;
+
+		private MeshFilter rendererFilter;
 
 		private void Awake()
 		{
 			renderer = GetComponent<MeshRenderer>();
 			filter = GetComponent<MeshFilter>();
+
+			rendererFilter = hairRenderer.GetComponent<MeshFilter>();
 		}
 
 		public void LateUpdate()
 		{
-			filter.sharedMesh = hairRenderer.Mesh;
+			filter.sharedMesh = rendererFilter.sharedMesh;
 		}
 	}
 }
