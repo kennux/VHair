@@ -85,7 +85,7 @@ namespace VHair
 				new VertexAttributeDescriptor(VertexAttribute.Normal, VertexAttributeFormat.Float32, 3),
 				new VertexAttributeDescriptor(VertexAttribute.Tangent, VertexAttributeFormat.Float32, 3), 
 				new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2));
-			mesh.SetSubMesh(0, new SubMeshDescriptor(0, indexCount), MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds);
+			mesh.SetSubMesh(0, new SubMeshDescriptor(0, indexCount, MeshTopology.Triangles), MeshUpdateFlags.DontValidateIndices | MeshUpdateFlags.DontRecalculateBounds | MeshUpdateFlags.DontResetBoneBounds);
 
 			vertexBuffer = mesh.GetVertexBuffer(0);
 			indexBuffer = mesh.GetIndexBuffer();

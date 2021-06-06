@@ -690,5 +690,8 @@ PrefabInstance:
       propertyPath: windZone
       value: 
       objectReference: {fileID: 600566120}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 6893440313086452044, guid: 05b92d11d86550d489d8d755846b3a00, type: 3}
+    - {fileID: 6893051525240555916, guid: 05b92d11d86550d489d8d755846b3a00, type: 3}
+    - {fileID: 6892614414881063028, guid: 05b92d11d86550d489d8d755846b3a00, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 05b92d11d86550d489d8d755846b3a00, type: 3}
